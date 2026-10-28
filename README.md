@@ -1,0 +1,40 @@
+# Taskbar Groups
+
+Colour-coded groups of app shortcuts on the Windows 11 taskbar. When space runs out they collapse into a single **Groups** flyout. See [`design/`](design/) for the mockups and [`docs/project-plan.md`](docs/project-plan.md) for the plan.
+
+**Status:** milestone 0 (scaffolding). The app currently opens an ordinary window listing the configured groups.
+
+## Stack
+
+C# / .NET 10 / WinUI 3 (Windows App SDK). It's an unpackaged, self-contained app: a plain `.exe` with nothing to install. Every package comes from Microsoft. Requires Windows 11 22H2 or later.
+
+## Getting started
+
+Nothing is installed globally. The .NET SDK, NuGet cache and CLI state all live in `.tools/`, which is git-ignored. To remove everything, delete that folder.
+
+```powershell
+.\scripts\bootstrap.ps1   # one-off: downloads the pinned .NET SDK into .tools\ (checks Microsoft's signature first)
+.\scripts\run.ps1         # build + run (Debug)
+.\scripts\test.ps1        # run tests
+.\scripts\publish.ps1     # Release build -> artifacts\publish\win-x64
+.\scripts\sandbox.ps1     # publish, then try it in Windows Sandbox (needs the Windows Sandbox feature)
+```
+
+To use `dotnet` directly in a terminal, dot-source the environment first. It only affects that terminal:
+
+```powershell
+. .\scripts\env.ps1
+```
+
+## Layout
+
+| Path | What |
+|---|---|
+| `src/TaskbarGroups` | WinUI 3 app |
+| `src/TaskbarGroups.Core` | UI-free logic (config, layout), unit-tested |
+| `tests/TaskbarGroups.Tests` | MSTest tests (light) |
+| `scripts/` | Toolchain and dev scripts |
+| `design/` | HTML/PNG mockups |
+| `docs/` | Project plan |
+
+User config lives at `%APPDATA%\TaskbarGroups\groups.json`. Until that file exists, the app uses a built-in sample.

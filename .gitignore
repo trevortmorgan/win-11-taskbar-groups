@@ -1,0 +1,16 @@
+# Project-local toolchain (SDK, NuGet cache, CLI state) - see scripts/bootstrap.ps1
+.tools/
+
+# Build output
+bin/
+obj/
+artifacts/
+TestResults/
+
+# Editors
+.vs/
+.vscode/*
+!.vscode/extensions.json
+*.user
+*.suo
+.idea/

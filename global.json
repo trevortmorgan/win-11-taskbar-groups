@@ -1,0 +1,9 @@
+{
+  "sdk": {
+    "version": "10.0.403",
+    "rollForward": "latestPatch",
+    "allowPrerelease": false,
+    "paths": [ ".tools/dotnet", "$host$" ],
+    "errorMessage": "The .NET SDK for this repo isn't installed. Run .\\scripts\\bootstrap.ps1 first."
+  }
+}
