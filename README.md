@@ -38,3 +38,7 @@ To use `dotnet` directly in a terminal, dot-source the environment first. It onl
 | `docs/` | Project plan |
 
 User config lives at `%APPDATA%\TaskbarGroups\groups.json`. Until that file exists, the app uses a built-in sample.
+
+## Licence
+
+[MIT](LICENSE)
