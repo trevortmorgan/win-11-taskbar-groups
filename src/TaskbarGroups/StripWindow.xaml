@@ -19,6 +19,11 @@
         </Grid.Resources>
         <Grid.ContextFlyout>
             <MenuFlyout>
+                <MenuFlyoutItem Text="Settings" Click="OnSettingsClick">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xE713;" />
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
                 <MenuFlyoutItem Text="Exit Taskbar Groups" Click="OnExitClick">
                     <MenuFlyoutItem.Icon>
                         <FontIcon Glyph="&#xE7E8;" />

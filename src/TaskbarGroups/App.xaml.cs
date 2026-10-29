@@ -13,6 +13,7 @@ public partial class App : Application
     private TaskbarHost? _host;
     private FileSystemWatcher? _configWatcher;
     private DispatcherQueueTimer? _reloadTimer;
+    private SettingsWindow? _settings;
 
     public App()
     {
@@ -38,6 +39,32 @@ public partial class App : Application
 
         _ = LoadGroupsAsync();
         WatchConfigFile();
+    }
+
+    /// <summary>Opens the settings window, or brings it forward if it's already open.</summary>
+    public void ShowSettings()
+    {
+        if (_settings is not null)
+        {
+            _settings.Activate();
+            return;
+        }
+
+        GroupsConfig? config = null;
+        string? error = null;
+        try
+        {
+            config = _store!.Load();
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"Couldn't load {_store!.Path} for the settings window", ex);
+            error = ex.Message;
+        }
+
+        _settings = new SettingsWindow(_store!, config, error);
+        _settings.Closed += (_, _) => _settings = null;
+        _settings.Activate();
     }
 
     private async Task LoadGroupsAsync()

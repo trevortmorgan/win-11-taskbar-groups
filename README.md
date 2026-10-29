@@ -2,13 +2,20 @@
 
 Colour-coded groups of app shortcuts on the Windows 11 taskbar. When space runs out they collapse into a single **Groups** flyout. See [`design/`](design/) for the mockups and [`docs/project-plan.md`](docs/project-plan.md) for the plan.
 
-**Status:** milestone 2. The groups sit in the free space on the taskbar, show each app's real icon, and launch the app when you click it. When they don't fit, they collapse into a **Groups** button that opens a list of every group (Esc or clicking elsewhere closes it). To quit, right-click the strip → *Exit*. The log is at `%LOCALAPPDATA%\TaskbarGroups\taskbargroups.log`.
+**Status:** milestone 2. The groups sit in the free space on the taskbar, show each app's real icon, and launch the app when you click it. When they don't fit, they collapse into a **Groups** button that opens a list of every group (Esc or clicking elsewhere closes it). Right-click the strip for **Settings** (add, edit and reorder groups and apps) or *Exit*. The log is at `%LOCALAPPDATA%\TaskbarGroups\taskbargroups.log`.
 
 **Roadmap:** planned work is tracked in [Issues](https://github.com/trevortmorgan/win-11-taskbar-groups/issues), grouped into [milestones](https://github.com/trevortmorgan/win-11-taskbar-groups/milestones).
 
 ## Setting up your groups
 
-Until the settings screen exists (milestone 4), you edit the groups file by hand: `%APPDATA%\TaskbarGroups\groups.json`. A sample is written there on first run. The strip reloads as soon as you save. If the file has a mistake in it, the current groups stay on screen and the error goes in the log.
+Right-click the strip → **Settings**. Every change is saved as you make it and shows on the taskbar straight away.
+
+- **Groups:** *Add group*, rename it in the **Name** box, reorder by dragging (or the ▲ ▼ buttons), and remove with *Delete group*.
+- **Colour:** pick one of the eight palette colours, or the palette button for any custom colour.
+- **Icon:** pick one of the bundled Fluent icons (searchable), *No icon* for the dot, or *Use my own .svg file…*.
+- **Apps:** *Browse…* for `.exe`/`.lnk` files, *Installed apps…* to choose from your Start menu apps (including Store apps), or drag shortcuts, programs and folders into the list. Drag rows to reorder them (or Alt+Shift+↑/↓ on the keyboard), rename an app by editing its name, and remove one with the bin button.
+
+Settings are stored in `%APPDATA%\TaskbarGroups\groups.json`, and you can still edit that file by hand (the strip reloads as soon as you save). Close the settings window before hand-editing, as it writes its own copy of the groups back. If the file has a mistake in it, the current groups stay on screen, the error goes in the log, and the settings window refuses to open until it's fixed. The format:
 
 ```json
 {
