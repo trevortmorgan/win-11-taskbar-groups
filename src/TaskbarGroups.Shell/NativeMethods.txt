@@ -19,6 +19,7 @@ SHQueryUserNotificationState
 
 // Placing and styling our window
 SetWindowPos
+SetForegroundWindow
 GetWindowLong
 SetWindowLong
 DwmSetWindowAttribute

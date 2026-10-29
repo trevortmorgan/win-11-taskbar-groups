@@ -2,7 +2,7 @@
 
 Colour-coded groups of app shortcuts on the Windows 11 taskbar. When space runs out they collapse into a single **Groups** flyout. See [`design/`](design/) for the mockups and [`docs/project-plan.md`](docs/project-plan.md) for the plan.
 
-**Status:** milestone 2. The groups sit in the free space on the taskbar, show each app's real icon, and launch the app when you click it. To quit, right-click the strip → *Exit*. The log is at `%LOCALAPPDATA%\TaskbarGroups\taskbargroups.log`.
+**Status:** milestone 2. The groups sit in the free space on the taskbar, show each app's real icon, and launch the app when you click it. When they don't fit, they collapse into a **Groups** button that opens a list of every group (Esc or clicking elsewhere closes it). To quit, right-click the strip → *Exit*. The log is at `%LOCALAPPDATA%\TaskbarGroups\taskbargroups.log`.
 
 **Roadmap:** planned work is tracked in [Issues](https://github.com/trevortmorgan/win-11-taskbar-groups/issues), grouped into [milestones](https://github.com/trevortmorgan/win-11-taskbar-groups/milestones).
 

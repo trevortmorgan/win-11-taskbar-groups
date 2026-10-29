@@ -18,7 +18,15 @@ public static class WindowChrome
     /// No taskbar/Alt+Tab entry, never takes focus when clicked, square corners, and a see-through background
     /// (XAML content still draws; anything we don't paint shows the taskbar underneath).
     /// </summary>
-    public static unsafe void MakeOverlay(nint hwnd)
+    public static void MakeOverlay(nint hwnd) => MakeFrameless(hwnd, activatable: false);
+
+    /// <summary>
+    /// The same as <see cref="MakeOverlay"/>, except the window can take focus (and so get keyboard input), for the
+    /// Groups flyout.
+    /// </summary>
+    public static void MakePopup(nint hwnd) => MakeFrameless(hwnd, activatable: true);
+
+    private static unsafe void MakeFrameless(nint hwnd, bool activatable)
     {
         var h = (HWND)hwnd;
 
@@ -27,7 +35,8 @@ public static class WindowChrome
         PInvoke.SetWindowSubclass(h, &FramelessWindowProc, FramelessSubclassId, 0);
 
         var exStyle = (WINDOW_EX_STYLE)PInvoke.GetWindowLong(h, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE);
-        exStyle = (exStyle | WINDOW_EX_STYLE.WS_EX_TOOLWINDOW | WINDOW_EX_STYLE.WS_EX_NOACTIVATE) & ~WINDOW_EX_STYLE.WS_EX_APPWINDOW;
+        exStyle = (exStyle | WINDOW_EX_STYLE.WS_EX_TOOLWINDOW) & ~WINDOW_EX_STYLE.WS_EX_APPWINDOW;
+        exStyle = activatable ? exStyle & ~WINDOW_EX_STYLE.WS_EX_NOACTIVATE : exStyle | WINDOW_EX_STYLE.WS_EX_NOACTIVATE;
         PInvoke.SetWindowLong(h, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE, (int)exStyle);
 
         var corners = DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_DONOTROUND;
@@ -75,6 +84,19 @@ public static class WindowChrome
     public static void BringToTop(nint hwnd) =>
         PInvoke.SetWindowPos((HWND)hwnd, HwndTopmost, 0, 0, 0, 0,
             SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE | SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE | SET_WINDOW_POS_FLAGS.SWP_NOOWNERZORDER);
+
+    /// <summary>The window the user is working in (has keyboard focus), or 0.</summary>
+    public static nint GetForeground() => PInvoke.GetForegroundWindow();
+
+    /// <summary>Gives a window keyboard focus back. Only allowed while our process has the focus.</summary>
+    public static void SetForeground(nint hwnd) => PInvoke.SetForegroundWindow((HWND)hwnd);
+
+    /// <summary>Brings the window to the front and gives it keyboard focus.</summary>
+    public static void Activate(nint hwnd)
+    {
+        BringToTop(hwnd);
+        PInvoke.SetForegroundWindow((HWND)hwnd);
+    }
 
     /// <summary>DPI of the monitor the window is on (96 = 100% scaling).</summary>
     public static uint GetDpi(nint hwnd) => PInvoke.GetDpiForWindow((HWND)hwnd);
