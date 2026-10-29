@@ -99,7 +99,7 @@ internal sealed class TaskbarHost : IDisposable
             null => "no taskbar",
             { IsOnScreen: false } => "taskbar auto-hidden",
             { IsHorizontal: false } => "taskbar not horizontal",
-            _ when WindowChrome.IsFullscreenAppRunning() => "fullscreen app running",
+            _ when FullscreenPolicy.IsFullscreenOn(taskbar.Monitor, WindowChrome.GetForegroundWindowInfo(), WindowChrome.WindowsReportsFullscreenApp()) => "fullscreen app on this monitor",
             _ => null,
         };
         if (hideReason is not null || taskbar is null)
