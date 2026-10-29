@@ -17,7 +17,7 @@ internal static class AppLauncher
     {
         try
         {
-            var windows = WindowSwitcher.FindWindows(AppIdentity.Parse(app.ResolvePath()));
+            var windows = WindowSwitcher.FindWindows(AppIdentity.Parse(app.ResolvePath(), new ShortcutReader()));
             var foreground = front != 0 ? front : WindowChrome.GetForeground();
             var action = ClickAction.Decide(windows, foreground, WindowSwitcher.IsShiftDown());
             switch (action.Kind)

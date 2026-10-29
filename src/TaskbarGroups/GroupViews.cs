@@ -32,7 +32,7 @@ public sealed class AppTile(AppShortcut shortcut, ImageSource? icon, double icon
     public event PropertyChangedEventHandler? PropertyChanged;
 
     /// <summary>Who to look for among the open windows.</summary>
-    public AppIdentity Identity { get; } = AppIdentity.Parse(shortcut.ResolvePath());
+    public AppIdentity Identity { get; } = AppIdentity.Parse(shortcut.ResolvePath(), new Shell.ShortcutReader());
 
     public RunningState State
     {

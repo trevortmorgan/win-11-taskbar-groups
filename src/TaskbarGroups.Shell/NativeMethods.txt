@@ -85,6 +85,14 @@ PropVariantToStringAlloc
 PropVariantClear
 CoTaskMemFree
 GetAsyncKeyState
+GetApplicationUserModelId
+SHGetPropertyStoreFromParsingName
+GETPROPERTYSTOREFLAGS
+ShellLink
+IShellLinkW
+IPersistFile
+SLGP_FLAGS
+STGM
 VIRTUAL_KEY
 
 // Notification-area (tray) icon and its menu

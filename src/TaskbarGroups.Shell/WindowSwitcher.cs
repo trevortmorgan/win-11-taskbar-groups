@@ -33,7 +33,8 @@ public static class WindowSwitcher
         {
             if (!HasTaskbarButton(h))
                 continue;
-            if (app.Matches(GetAumid(h), app.ExePath is null ? null : GetExePath(h)))
+            var (aumid, exePath) = Identify(h);
+            if (app.Matches(aumid, exePath))
                 found.Add(h);
         }
         return found;
@@ -45,10 +46,55 @@ public static class WindowSwitcher
         var found = new List<WindowInfo>();
         for (var h = PInvoke.GetTopWindow(HWND.Null); h != HWND.Null; h = PInvoke.GetWindow(h, GET_WINDOW_CMD.GW_HWNDNEXT))
         {
-            if (HasTaskbarButton(h))
-                found.Add(new WindowInfo(h, GetAumid(h), GetExePath(h)));
+            if (!HasTaskbarButton(h))
+                continue;
+            var (aumid, exePath) = Identify(h);
+            found.Add(new WindowInfo(h, aumid, exePath));
         }
         return found;
+    }
+
+    /// <summary>
+    /// Which app a window belongs to. The window's own AppUserModelID is rare: Store apps only have one on their
+    /// process. A window hosted by ApplicationFrameHost (Calculator, Settings) belongs to the process of its inner
+    /// CoreWindow child instead.
+    /// </summary>
+    private static unsafe (string? Aumid, string? ExePath) Identify(HWND h)
+    {
+        var aumid = GetAumid(h);
+        uint pid;
+        if (PInvoke.GetWindowThreadProcessId(h, &pid) == 0)
+            return (aumid, null);
+
+        var exePath = GetExePath(pid);
+        aumid ??= GetProcessAumid(pid);
+        if (aumid is not null)
+            return (aumid, exePath);
+
+        // No identity from the frame's own process: look at the processes of its child windows.
+        for (var child = PInvoke.GetWindow(h, GET_WINDOW_CMD.GW_CHILD); child != HWND.Null; child = PInvoke.GetWindow(child, GET_WINDOW_CMD.GW_HWNDNEXT))
+        {
+            uint childPid;
+            if (PInvoke.GetWindowThreadProcessId(child, &childPid) == 0 || childPid == pid)
+                continue;
+            if (GetProcessAumid(childPid) is { } childAumid)
+                return (childAumid, GetExePath(childPid));
+        }
+        return (null, exePath);
+    }
+
+    /// <summary>The package app ID (e.g. <c>Microsoft.Paint_8wekyb3d8bbwe!App</c>) of a Store app's process; null for unpackaged ones.</summary>
+    private static unsafe string? GetProcessAumid(uint pid)
+    {
+        using var process = PInvoke.OpenProcess_SafeHandle(PROCESS_ACCESS_RIGHTS.PROCESS_QUERY_LIMITED_INFORMATION, false, pid);
+        if (process.IsInvalid)
+            return null;
+
+        Span<char> buffer = stackalloc char[512];
+        uint length = (uint)buffer.Length;
+        return PInvoke.GetApplicationUserModelId(process, ref length, buffer) == WIN32_ERROR.ERROR_SUCCESS && length > 1
+            ? new string(buffer[..((int)length - 1)]) // length counts the terminating null
+            : null;
     }
 
     /// <summary>True while Shift is held: the Windows convention for "open a new window".</summary>
@@ -126,11 +172,8 @@ public static class WindowSwitcher
         }
     }
 
-    private static unsafe string? GetExePath(HWND h)
+    private static unsafe string? GetExePath(uint pid)
     {
-        uint pid;
-        if (PInvoke.GetWindowThreadProcessId(h, &pid) == 0)
-            return null;
         using var process = PInvoke.OpenProcess_SafeHandle(PROCESS_ACCESS_RIGHTS.PROCESS_QUERY_LIMITED_INFORMATION, false, pid);
         if (process.IsInvalid)
             return null;
