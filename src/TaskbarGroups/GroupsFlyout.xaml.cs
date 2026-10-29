@@ -187,8 +187,8 @@ public sealed partial class GroupsFlyout : Window
     {
         if (sender is FrameworkElement { Tag: AppTile tile })
         {
-            // Launch while we still have the focus, so Windows lets the app come to the front.
-            AppLauncher.Launch(tile.Shortcut);
+            // Act while we still have the focus, so Windows lets the app come to the front.
+            AppLauncher.Open(tile.Shortcut, _returnFocusTo);
             Dismiss();
         }
     }
