@@ -8,7 +8,7 @@ using Windows.Win32.UI.Accessibility;
 
 namespace TaskbarGroups.Shell;
 
-/// <summary>What the primary taskbar looks like right now. All rects are physical screen pixels.</summary>
+/// <summary>What one taskbar looks like right now. All rects are physical screen pixels.</summary>
 /// <param name="Controls">Every Windows control on the taskbar (Start, Search, app buttons, tray, clock…). We must not cover these.</param>
 /// <param name="AppButtonsRight">Right edge of Start and the app buttons, i.e. where Windows' own icons end.</param>
 public sealed record TaskbarSnapshot(nint Handle, IntRect Bounds, IntRect Monitor, IReadOnlyList<IntRect> Controls, int AppButtonsRight, uint Dpi)
@@ -19,7 +19,7 @@ public sealed record TaskbarSnapshot(nint Handle, IntRect Bounds, IntRect Monito
 }
 
 /// <summary>
-/// Reads the primary taskbar's layout via UI Automation. Windows 11 draws the taskbar in XAML inside one window,
+/// Reads a taskbar's layout (the primary one, or a secondary one on another monitor) via UI Automation. Windows 11 draws the taskbar in XAML inside one window,
 /// so UI Automation is the only supported way to see where its buttons are.
 /// Create and call from a background (MTA) thread, never the UI thread.
 /// </summary>
@@ -46,16 +46,32 @@ public sealed class TaskbarProbe
         _cacheRequest.put_AutomationElementMode(AutomationElementMode.AutomationElementMode_None);
     }
 
-    /// <summary>Returns null if there's no taskbar (e.g. Explorer is restarting).</summary>
-    public TaskbarSnapshot? Read()
+    /// <summary>
+    /// The secondary taskbars, one per other monitor while *Show my taskbar on all displays* is on. Cheap; safe to
+    /// call from any thread.
+    /// </summary>
+    public static IReadOnlyList<nint> FindSecondaryTaskbars()
     {
-        var hwnd = PInvoke.FindWindow("Shell_TrayWnd", null);
-        if (hwnd.IsNull || !PInvoke.GetWindowRect(hwnd, out var bounds))
+        var found = new List<nint>();
+        var hwnd = HWND.Null;
+        while (!(hwnd = PInvoke.FindWindowEx(HWND.Null, hwnd, "Shell_SecondaryTrayWnd", null)).IsNull)
+            found.Add(hwnd);
+        return found;
+    }
+
+    /// <summary>
+    /// Reads the taskbar with this window handle, or the primary taskbar when <paramref name="taskbar"/> is null.
+    /// Returns null if it doesn't exist (Explorer is restarting, or the monitor was unplugged).
+    /// </summary>
+    public TaskbarSnapshot? Read(nint? taskbar = null)
+    {
+        var hwnd = taskbar is { } given ? (HWND)given : PInvoke.FindWindow("Shell_TrayWnd", null);
+        if (hwnd.IsNull || !PInvoke.IsWindow(hwnd) || !PInvoke.GetWindowRect(hwnd, out var bounds))
             return null;
 
-        var taskbar = ToIntRect(bounds);
+        var bar = ToIntRect(bounds);
         var controls = new List<IntRect>();
-        var appButtonsRight = taskbar.Left;
+        var appButtonsRight = bar.Left;
 
         var elements = _automation.ElementFromHandle(hwnd).FindAllBuildCache(TreeScope.TreeScope_Descendants, _allElements, _cacheRequest);
         for (var i = 0; i < elements.get_Length(); i++)
@@ -73,13 +89,13 @@ public sealed class TaskbarProbe
                 appButtonsRight = Math.Max(appButtonsRight, rect.Right);
         }
 
-        return new TaskbarSnapshot(hwnd, taskbar, MonitorBounds(hwnd), controls, appButtonsRight, PInvoke.GetDpiForWindow(hwnd));
+        return new TaskbarSnapshot(hwnd, bar, MonitorBounds(hwnd), controls, appButtonsRight, PInvoke.GetDpiForWindow(hwnd));
     }
 
     private static IntRect MonitorBounds(HWND hwnd)
     {
         var info = new MONITORINFO { cbSize = (uint)Marshal.SizeOf<MONITORINFO>() };
-        PInvoke.GetMonitorInfo(PInvoke.MonitorFromWindow(hwnd, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTOPRIMARY), ref info);
+        PInvoke.GetMonitorInfo(PInvoke.MonitorFromWindow(hwnd, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST), ref info);
         return ToIntRect(info.rcMonitor);
     }
 

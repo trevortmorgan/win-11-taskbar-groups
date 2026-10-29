@@ -20,6 +20,11 @@ public sealed partial class StripWindow : Window
     /// <summary>The list that opens from the "Groups" button. Created the first time it's needed.</summary>
     private GroupsFlyout? _flyout;
 
+    private IReadOnlyList<Group>? _groups;
+    private string? _configDirectory;
+    private uint _dpi;
+    private int _generation;
+
     public StripWindow()
     {
         InitializeComponent();
@@ -49,6 +54,11 @@ public sealed partial class StripWindow : Window
         // Follow the taskbar's light/dark setting, live.
         Root.RequestedTheme = TaskbarTheme.Element;
         TaskbarTheme.Changed += ApplyTheme;
+        Closed += (_, _) =>
+        {
+            timer.Stop();
+            TaskbarTheme.Changed -= ApplyTheme;
+        };
     }
 
     public nint Handle { get; }
@@ -70,12 +80,38 @@ public sealed partial class StripWindow : Window
     /// </summary>
     public async Task SetGroupsAsync(IReadOnlyList<Group> groups, string configDirectory)
     {
-        // Load icons at exactly the screen pixels they'll occupy, and display them at that size in DIPs, so there's
+        _groups = groups;
+        _configDirectory = configDirectory;
+        await ReloadAsync();
+    }
+
+    /// <summary>
+    /// Tells the strip the scale of the monitor it is on. When that changes (window dragged to another scale,
+    /// display settings changed) the icons are loaded again at the new size.
+    /// </summary>
+    public void SetDpi(uint dpi)
+    {
+        if (dpi == 0 || dpi == _dpi)
+            return;
+        _dpi = dpi;
+        if (_groups is not null)
+            _ = ReloadAsync();
+    }
+
+    private async Task ReloadAsync()
+    {
+        var groups = _groups!;
+        var configDirectory = _configDirectory!;
+        var generation = ++_generation;
+
+        // Load icons at exactly the screen pixels they will occupy, and display them at that size in DIPs, so there is
         // no further scaling (which is what makes icons look soft).
-        var scale = WindowChrome.GetDpi(Handle) / 96.0;
+        var scale = (_dpi == 0 ? WindowChrome.GetDpi(Handle) : _dpi) / 96.0;
         var sizePx = (int)Math.Round(IconDips * scale);
         var sizeDips = sizePx / scale;
         var icons = await IconLoader.LoadAsync(groups.SelectMany(g => g.Apps).Select(a => a.ResolvePath()), sizePx);
+        if (generation != _generation)
+            return; // a newer load (other groups, or another scale) has superseded this one
 
         Pills.ItemsSource = groups
             .Select(g => new GroupView(g, ResolveIcon(g, configDirectory), g.Apps

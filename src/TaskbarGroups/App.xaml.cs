@@ -12,8 +12,7 @@ public partial class App : Application
 {
     private Mutex? _singleInstance;
     private ConfigStore? _store;
-    private StripWindow? _strip;
-    private TaskbarHost? _host;
+    private StripManager? _strips;
     private FileSystemWatcher? _configWatcher;
     private DispatcherQueueTimer? _reloadTimer;
     private SettingsWindow? _settings;
@@ -38,13 +37,12 @@ public partial class App : Application
         }
 
         _store = new ConfigStore(ConfigPathFromArgs() ?? ConfigStore.DefaultPath);
-        _strip = new StripWindow();
-        _strip.Closed += (_, _) =>
+        _strips = new StripManager();
+        _strips.Primary.Closed += (_, _) =>
         {
             _tray?.Dispose();
-            _host?.Dispose();
+            _strips.Dispose();
         };
-        _host = new TaskbarHost(_strip);
 
         _ = LoadGroupsAsync();
         WatchConfigFile();
@@ -69,7 +67,7 @@ public partial class App : Application
     private IReadOnlyList<TrayMenuItem> BuildTrayMenu() =>
     [
         new("Settings", ShowSettings),
-        new("Show on taskbar", () => _host!.UserHidden = !_host.UserHidden, Checked: !_host!.UserHidden),
+        new("Show on taskbar", () => _strips!.UserHidden = !_strips.UserHidden, Checked: !_strips!.UserHidden),
         new("Start with Windows", ToggleStartup, Checked: IsStartupEnabled()),
         TrayMenuItem.Separator,
         new("Edit groups file", () => OpenShell(_store!.Path)),
@@ -148,7 +146,7 @@ public partial class App : Application
         try
         {
             var config = _store!.LoadOrCreate();
-            await _strip!.SetGroupsAsync(config.Groups, Path.GetDirectoryName(_store.Path)!);
+            await _strips!.SetGroupsAsync(config.Groups, Path.GetDirectoryName(_store.Path)!);
             Log.Info($"Loaded {config.Groups.Count} groups from {_store.Path}");
         }
         catch (Exception ex)
@@ -165,7 +163,7 @@ public partial class App : Application
         Directory.CreateDirectory(directory);
 
         // Editors often save in several steps, so wait for things to settle before reloading.
-        _reloadTimer = _strip!.DispatcherQueue.CreateTimer();
+        _reloadTimer = _strips!.Primary.DispatcherQueue.CreateTimer();
         _reloadTimer.Interval = TimeSpan.FromMilliseconds(400);
         _reloadTimer.IsRepeating = false;
         _reloadTimer.Tick += (_, _) => _ = LoadGroupsAsync();
@@ -174,7 +172,7 @@ public partial class App : Application
         {
             NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.Size,
         };
-        FileSystemEventHandler onChange = (_, _) => _strip.DispatcherQueue.TryEnqueue(() =>
+        FileSystemEventHandler onChange = (_, _) => _strips.Primary.DispatcherQueue.TryEnqueue(() =>
         {
             _reloadTimer.Stop();
             _reloadTimer.Start();
