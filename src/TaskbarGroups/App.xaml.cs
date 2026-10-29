@@ -4,6 +4,7 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using TaskbarGroups.Config;
 using TaskbarGroups.Shell;
+using TaskbarGroups.Startup;
 
 namespace TaskbarGroups;
 
@@ -17,6 +18,7 @@ public partial class App : Application
     private DispatcherQueueTimer? _reloadTimer;
     private SettingsWindow? _settings;
     private TrayIcon? _tray;
+    private readonly StartupRegistration _startup = StartupRegistration.ForCurrentProcess();
 
     public App()
     {
@@ -68,12 +70,40 @@ public partial class App : Application
     [
         new("Settings", ShowSettings),
         new("Show on taskbar", () => _host!.UserHidden = !_host.UserHidden, Checked: !_host!.UserHidden),
+        new("Start with Windows", ToggleStartup, Checked: IsStartupEnabled()),
         TrayMenuItem.Separator,
         new("Edit groups file", () => OpenShell(_store!.Path)),
         new("Open log folder", () => OpenShell(Log.Directory)),
         TrayMenuItem.Separator,
         new("Exit", Exit),
     ];
+
+    private bool IsStartupEnabled()
+    {
+        try
+        {
+            return _startup.IsEnabled; // read fresh every time the menu opens
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Couldn't read the start-with-Windows setting", ex);
+            return false;
+        }
+    }
+
+    private void ToggleStartup()
+    {
+        try
+        {
+            var enable = !_startup.IsEnabled;
+            _startup.SetEnabled(enable);
+            Log.Info($"Start with Windows: {(enable ? "on" : "off")}");
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Couldn't change the start-with-Windows setting", ex);
+        }
+    }
 
     private static void OpenShell(string path)
     {
