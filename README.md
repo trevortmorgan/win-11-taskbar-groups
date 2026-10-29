@@ -46,6 +46,25 @@ Settings are stored in `%APPDATA%\TaskbarGroups\groups.json`, and you can still 
 
 To try a different file without touching yours, run `TaskbarGroups.exe --config path\to\groups.json`.
 
+## Installing a release
+
+1. Download `TaskbarGroups-<version>-win-x64.zip` (or `win-arm64` for ARM PCs) from the [Releases](https://github.com/trevortmorgan/win-11-taskbar-groups/releases) page.
+2. Right-click the zip → *Properties* → tick *Unblock* → OK (or run `Unblock-File` on it), then extract it somewhere you'll keep it, e.g. `%LOCALAPPDATA%\Programs\TaskbarGroups`.
+3. Run `TaskbarGroups.exe`. Use the tray icon's *Start with Windows* to have it start at sign-in.
+
+The build isn't code-signed, so SmartScreen may warn on first run (*More info* → *Run anyway*). `SHA256SUMS.txt` on the release lets you check the download. To uninstall, exit from the tray icon and delete the folder; settings stay in `%APPDATA%\TaskbarGroups` until you delete them too.
+
+### Cutting a release
+
+Maintainers: from an up-to-date `main`, push a version tag. The [release workflow](.github/workflows/release.yml) runs the tests, publishes win-x64 and win-arm64, zips them and creates the GitHub Release with generated notes. A tag with a suffix (`v0.3.0-beta.1`) is marked as a pre-release.
+
+```powershell
+git tag v0.3.0
+git push origin v0.3.0
+```
+
+The tag must look like `vMAJOR.MINOR.PATCH`; the number is stamped into the executable's version.
+
 ## Stack
 
 C# / .NET 10 / WinUI 3 (Windows App SDK). It's an unpackaged, self-contained app: a plain `.exe` with nothing to install. Every package comes from Microsoft. Requires Windows 11 22H2 or later.
