@@ -36,6 +36,7 @@ SetWinEventHook
 UnhookWinEvent
 EVENT_SYSTEM_FOREGROUND
 GetForegroundWindow
+GetClassName
 
 WINDOW_EX_STYLE
 WINEVENT_OUTOFCONTEXT

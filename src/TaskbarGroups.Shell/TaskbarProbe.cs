@@ -89,14 +89,7 @@ public sealed class TaskbarProbe
                 appButtonsRight = Math.Max(appButtonsRight, rect.Right);
         }
 
-        return new TaskbarSnapshot(hwnd, bar, MonitorBounds(hwnd), controls, appButtonsRight, PInvoke.GetDpiForWindow(hwnd));
-    }
-
-    private static IntRect MonitorBounds(HWND hwnd)
-    {
-        var info = new MONITORINFO { cbSize = (uint)Marshal.SizeOf<MONITORINFO>() };
-        PInvoke.GetMonitorInfo(PInvoke.MonitorFromWindow(hwnd, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST), ref info);
-        return ToIntRect(info.rcMonitor);
+        return new TaskbarSnapshot(hwnd, bar, WindowChrome.MonitorBounds(hwnd), controls, appButtonsRight, PInvoke.GetDpiForWindow(hwnd));
     }
 
     private static IntRect ToIntRect(RECT r) => new(r.left, r.top, r.right, r.bottom);

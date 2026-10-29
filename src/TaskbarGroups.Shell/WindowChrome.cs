@@ -4,6 +4,7 @@ using TaskbarGroups.Layout;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Dwm;
+using Windows.Win32.Graphics.Gdi;
 using Windows.Win32.UI.Shell;
 using Windows.Win32.UI.WindowsAndMessaging;
 
@@ -101,10 +102,39 @@ public static class WindowChrome
     /// <summary>DPI of the monitor the window is on (96 = 100% scaling).</summary>
     public static uint GetDpi(nint hwnd) => PInvoke.GetDpiForWindow((HWND)hwnd);
 
-    /// <summary>True while a fullscreen game, video or presentation is running. Windows hides the taskbar then, so we should too.</summary>
-    public static bool IsFullscreenAppRunning() =>
+    /// <summary>
+    /// True while Windows reports a fullscreen game, video or presentation somewhere. This is machine-wide: it says
+    /// nothing about which monitor, so use it with <see cref="GetForegroundWindowInfo"/> (FullscreenPolicy).
+    /// </summary>
+    public static bool WindowsReportsFullscreenApp() =>
         PInvoke.SHQueryUserNotificationState(out var state).Succeeded
         && state is QUERY_USER_NOTIFICATION_STATE.QUNS_BUSY
             or QUERY_USER_NOTIFICATION_STATE.QUNS_RUNNING_D3D_FULL_SCREEN
             or QUERY_USER_NOTIFICATION_STATE.QUNS_PRESENTATION_MODE;
+
+    /// <summary>The window in front and the monitor it is on, or null if there is none (or it is minimised).</summary>
+    public static unsafe ForegroundWindow? GetForegroundWindowInfo()
+    {
+        var hwnd = PInvoke.GetForegroundWindow();
+        if (hwnd.IsNull || PInvoke.IsIconic(hwnd) || !PInvoke.GetWindowRect(hwnd, out var rect))
+            return null;
+
+        // The desktop (Progman / WorkerW) and the taskbars cover whole monitors but are not apps.
+        Span<char> buffer = stackalloc char[64];
+        int length;
+        fixed (char* p = buffer)
+            length = PInvoke.GetClassName(hwnd, new PWSTR(p), buffer.Length);
+        var className = new string(buffer[..length]);
+        var isShell = className is "Progman" or "WorkerW" or "Shell_TrayWnd" or "Shell_SecondaryTrayWnd";
+
+        return new ForegroundWindow(new IntRect(rect.left, rect.top, rect.right, rect.bottom), MonitorBounds(hwnd), isShell);
+    }
+
+    /// <summary>The rectangle of the monitor the window is mostly on, in physical pixels.</summary>
+    public static IntRect MonitorBounds(nint hwnd)
+    {
+        var info = new MONITORINFO { cbSize = (uint)Marshal.SizeOf<MONITORINFO>() };
+        PInvoke.GetMonitorInfo(PInvoke.MonitorFromWindow((HWND)hwnd, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST), ref info);
+        return new IntRect(info.rcMonitor.left, info.rcMonitor.top, info.rcMonitor.right, info.rcMonitor.bottom);
+    }
 }
