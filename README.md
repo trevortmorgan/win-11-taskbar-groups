@@ -4,6 +4,8 @@ Colour-coded groups of app shortcuts on the Windows 11 taskbar. When space runs 
 
 **Status:** milestone 2. The groups sit in the free space on the taskbar, show each app's real icon, and launch the app when you click it. To quit, right-click the strip → *Exit*. The log is at `%LOCALAPPDATA%\TaskbarGroups\taskbargroups.log`.
 
+**Roadmap:** planned work is tracked in [Issues](https://github.com/trevortmorgan/win-11-taskbar-groups/issues), grouped into [milestones](https://github.com/trevortmorgan/win-11-taskbar-groups/milestones).
+
 ## Setting up your groups
 
 Until the settings screen exists (milestone 4), you edit the groups file by hand: `%APPDATA%\TaskbarGroups\groups.json`. A sample is written there on first run. The strip reloads as soon as you save. If the file has a mistake in it, the current groups stay on screen and the error goes in the log.
