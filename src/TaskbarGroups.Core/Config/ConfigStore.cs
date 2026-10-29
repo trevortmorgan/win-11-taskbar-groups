@@ -41,6 +41,7 @@ public sealed class ConfigStore(string path)
 }
 
 // Source-generated serializer: no reflection, so it survives trimming in the release build.
-[JsonSourceGenerationOptions(JsonSerializerDefaults.Web, WriteIndented = true)]
+// Optional fields that aren't set are left out, which keeps the file short for hand-editing.
+[JsonSourceGenerationOptions(JsonSerializerDefaults.Web, WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull)]
 [JsonSerializable(typeof(GroupsConfig))]
 internal sealed partial class ConfigJsonContext : JsonSerializerContext;

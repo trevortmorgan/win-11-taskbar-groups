@@ -3,6 +3,7 @@ using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using TaskbarGroups.Config;
+using TaskbarGroups.Icons;
 using TaskbarGroups.Layout;
 using TaskbarGroups.Shell;
 using Windows.Foundation;
@@ -39,8 +40,11 @@ public sealed partial class StripWindow : Window
 
     public FrameworkElement RootElement => Root;
 
-    /// <summary>Shows these groups, with each app's real icon. Call on the UI thread.</summary>
-    public async Task SetGroupsAsync(IReadOnlyList<Group> groups)
+    /// <summary>
+    /// Shows these groups, with each app's real icon. Relative paths to group icons are relative to
+    /// <paramref name="configDirectory"/>. Call on the UI thread.
+    /// </summary>
+    public async Task SetGroupsAsync(IReadOnlyList<Group> groups, string configDirectory)
     {
         // Load icons at exactly the screen pixels they'll occupy, and display them at that size in DIPs, so there's
         // no further scaling (which is what makes icons look soft).
@@ -50,7 +54,7 @@ public sealed partial class StripWindow : Window
         var icons = await IconLoader.LoadAsync(groups.SelectMany(g => g.Apps).Select(a => a.ResolvePath()), sizePx);
 
         Pills.ItemsSource = groups
-            .Select(g => new GroupView(g, g.Apps
+            .Select(g => new GroupView(g, ResolveIcon(g, configDirectory), g.Apps
                 .Select(a => new AppTile(a, icons.GetValueOrDefault(a.ResolvePath()) is { } icon ? IconLoader.ToBitmap(icon) : null, sizeDips))
                 .ToList()))
             .ToList();
@@ -58,6 +62,15 @@ public sealed partial class StripWindow : Window
     }
 
     private IReadOnlyList<GroupView> GroupViews => Pills.ItemsSource as IReadOnlyList<GroupView> ?? [];
+
+    private static GroupIcon? ResolveIcon(Group group, string configDirectory)
+    {
+        if (GroupIcon.TryResolve(group.Icon, configDirectory, out var icon, out var error))
+            return icon;
+        if (error is not null)
+            Log.Info($"Group \"{group.Name}\": {error}; showing the dot instead");
+        return null;
+    }
 
     /// <summary>Wide pills, or the single "Groups" button.</summary>
     public bool IsCollapsed
