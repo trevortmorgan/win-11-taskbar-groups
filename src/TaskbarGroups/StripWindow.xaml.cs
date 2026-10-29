@@ -101,7 +101,7 @@ public sealed partial class StripWindow : Window
     private void OnAppClick(object sender, RoutedEventArgs e)
     {
         if (sender is FrameworkElement { Tag: AppTile tile })
-            AppLauncher.Launch(tile.Shortcut);
+            AppLauncher.Open(tile.Shortcut);
     }
 
     /// <summary>The "Groups" button opens (or closes) the list of every group above it.</summary>

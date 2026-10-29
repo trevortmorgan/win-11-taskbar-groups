@@ -62,3 +62,27 @@ CreateCompatibleDC
 DeleteDC
 DIB_USAGE
 BI_COMPRESSION
+
+// Finding, switching to and minimising other apps' windows
+GetTopWindow
+GetWindow
+GET_WINDOW_CMD
+IsWindowVisible
+IsIconic
+ShowWindow
+SHOW_WINDOW_CMD
+BringWindowToTop
+GetWindowThreadProcessId
+GetCurrentThreadId
+AttachThreadInput
+OpenProcess
+QueryFullProcessImageName
+CloseHandle
+DwmGetWindowAttribute
+SHGetPropertyStoreForWindow
+IPropertyStore
+PropVariantToStringAlloc
+PropVariantClear
+CoTaskMemFree
+GetAsyncKeyState
+VIRTUAL_KEY
