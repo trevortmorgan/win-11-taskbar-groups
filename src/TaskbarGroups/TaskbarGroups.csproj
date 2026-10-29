@@ -44,6 +44,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TaskbarGroups.Core\TaskbarGroups.Core.csproj" />
+    <ProjectReference Include="..\TaskbarGroups.Shell\TaskbarGroups.Shell.csproj" />
   </ItemGroup>
 
 </Project>

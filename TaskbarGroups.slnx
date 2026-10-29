@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/TaskbarGroups.Core/TaskbarGroups.Core.csproj" />
+    <Project Path="src/TaskbarGroups.Shell/TaskbarGroups.Shell.csproj" />
     <Project Path="src/TaskbarGroups/TaskbarGroups.csproj" />
   </Folder>
   <Folder Name="/tests/">

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Window
+    x:Class="TaskbarGroups.StripWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:config="using:TaskbarGroups.Config"
+    xmlns:local="using:TaskbarGroups"
+    Title="Taskbar Groups">
+
+    <!-- Sits on the taskbar. Transparent everywhere except the pills themselves. -->
+    <Grid x:Name="Root" Background="Transparent" RequestedTheme="Dark">
+        <Grid.ContextFlyout>
+            <MenuFlyout>
+                <MenuFlyoutItem Text="Exit Taskbar Groups" Click="OnExitClick">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xE7E8;" />
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
+            </MenuFlyout>
+        </Grid.ContextFlyout>
+
+        <!-- Wide layout: one pill per group (see design/large-screen.png). -->
+        <ItemsControl x:Name="Pills" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" Spacing="6" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="config:Group">
+                    <Border Height="40" Padding="4,0" CornerRadius="10"
+                            Background="{x:Bind local:BindingHelpers.Tint(Color, 0.12)}"
+                            BorderBrush="{x:Bind local:BindingHelpers.Brush(Color)}" BorderThickness="0,2,0,0">
+                        <StackPanel Orientation="Horizontal" Spacing="2">
+                            <StackPanel Orientation="Horizontal" Spacing="7" Padding="7,0,6,0" VerticalAlignment="Center">
+                                <Ellipse Width="8" Height="8" VerticalAlignment="Center" Fill="{x:Bind local:BindingHelpers.Brush(Color)}" />
+                                <TextBlock Text="{x:Bind Name}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"
+                                           Foreground="{x:Bind local:BindingHelpers.Light(Color)}" />
+                            </StackPanel>
+                            <ItemsControl ItemsSource="{x:Bind Apps}" VerticalAlignment="Center">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" Spacing="2" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="config:AppShortcut">
+                                        <Border Width="32" Height="32" CornerRadius="6" Background="#14FFFFFF" ToolTipService.ToolTip="{x:Bind Name}">
+                                            <TextBlock Text="{x:Bind local:BindingHelpers.Initial(Name)}" FontSize="13"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <!-- Narrow layout: everything collapses into one button (see design/small-screen.png). -->
+        <Border x:Name="GroupsButton" Height="40" Padding="12,0" CornerRadius="10" HorizontalAlignment="Left" VerticalAlignment="Center"
+                Background="#991F2937" BorderBrush="#806B7280" BorderThickness="1" Opacity="0" IsHitTestVisible="False">
+            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <FontIcon Glyph="&#xE81E;" FontSize="14" Foreground="#60A5FA" />
+                <TextBlock Text="Groups" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
+                <FontIcon Glyph="&#xE70E;" FontSize="10" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
