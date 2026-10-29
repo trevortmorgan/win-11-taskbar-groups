@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<UserControl
+    x:Class="TaskbarGroups.GroupMark"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- The group's icon, or a coloured dot when it has none. Sized to whichever is showing. -->
+    <Grid>
+        <Ellipse x:Name="Dot" Width="8" Height="8" />
+        <Image x:Name="Glyph" Stretch="Fill" Visibility="Collapsed" />
+    </Grid>
+</UserControl>

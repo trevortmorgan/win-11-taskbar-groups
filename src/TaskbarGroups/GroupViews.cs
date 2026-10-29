@@ -1,14 +1,18 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using TaskbarGroups.Config;
+using TaskbarGroups.Icons;
 
 namespace TaskbarGroups;
 
 /// <summary>A group as shown on the strip.</summary>
-public sealed class GroupView(Group group, IReadOnlyList<AppTile> apps)
+public sealed class GroupView(Group group, GroupIcon? icon, IReadOnlyList<AppTile> apps)
 {
     public string Name => group.Name;
     public string Color => group.Color;
+
+    /// <summary>Null for the plain dot. Show it with <see cref="GroupMark"/>.</summary>
+    public GroupIcon? Icon => icon;
     public IReadOnlyList<AppTile> Apps => apps;
 }
 

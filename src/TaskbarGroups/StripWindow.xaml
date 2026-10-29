@@ -41,7 +41,7 @@
                             BorderBrush="{x:Bind local:BindingHelpers.Brush(Color)}" BorderThickness="0,2,0,0">
                         <StackPanel Orientation="Horizontal" Spacing="2">
                             <StackPanel Orientation="Horizontal" Spacing="7" Padding="7,0,6,0" VerticalAlignment="Center">
-                                <Ellipse Width="8" Height="8" VerticalAlignment="Center" Fill="{x:Bind local:BindingHelpers.Brush(Color)}" />
+                                <local:GroupMark Icon="{x:Bind Icon}" Color="{x:Bind Color}" VerticalAlignment="Center" />
                                 <TextBlock Text="{x:Bind Name}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"
                                            Foreground="{x:Bind local:BindingHelpers.Light(Color)}" />
                             </StackPanel>

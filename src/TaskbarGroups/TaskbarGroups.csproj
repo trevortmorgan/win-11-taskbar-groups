@@ -34,6 +34,9 @@
 
   <ItemGroup>
     <Content Include="Assets\AppIcon.ico" />
+    <!-- Licence for the bundled Fluent icons; it has to travel with the app. -->
+    <Content Include="..\..\THIRD-PARTY-NOTICES.md" Link="THIRD-PARTY-NOTICES.md"
+             CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 
