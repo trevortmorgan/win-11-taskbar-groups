@@ -22,6 +22,14 @@ public sealed class ConfigStore(string path)
             ?? throw new InvalidDataException($"Config file is empty: {Path}");
     }
 
+    /// <summary>Like <see cref="Load"/>, but writes the sample to disk first if there's no file, so it can be edited.</summary>
+    public GroupsConfig LoadOrCreate()
+    {
+        if (!File.Exists(Path))
+            Save(GroupsConfig.Sample);
+        return Load();
+    }
+
     public void Save(GroupsConfig config)
     {
         Directory.CreateDirectory(System.IO.Path.GetDirectoryName(Path)!);

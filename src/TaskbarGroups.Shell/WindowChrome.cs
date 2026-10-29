@@ -76,6 +76,9 @@ public static class WindowChrome
         PInvoke.SetWindowPos((HWND)hwnd, HwndTopmost, 0, 0, 0, 0,
             SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE | SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE | SET_WINDOW_POS_FLAGS.SWP_NOOWNERZORDER);
 
+    /// <summary>DPI of the monitor the window is on (96 = 100% scaling).</summary>
+    public static uint GetDpi(nint hwnd) => PInvoke.GetDpiForWindow((HWND)hwnd);
+
     /// <summary>True while a fullscreen game, video or presentation is running. Windows hides the taskbar then, so we should too.</summary>
     public static bool IsFullscreenAppRunning() =>
         PInvoke.SHQueryUserNotificationState(out var state).Succeeded
