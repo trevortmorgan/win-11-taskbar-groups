@@ -24,8 +24,6 @@ public sealed class AppTile(AppShortcut shortcut, ImageSource? icon, double icon
 {
     // Windows 11's taskbar: a short grey bar while running, a longer accent-coloured one for the app in front
     // (.active-dot and .active-dot.focus in design/taskbar_groups.html).
-    private static readonly SolidColorBrush RunningBrush = new(Color.FromArgb(0xFF, 0xD1, 0xD5, 0xDB));
-    private static readonly SolidColorBrush FocusedBrush = new(Color.FromArgb(0xFF, 0x60, 0xA5, 0xFA));
 
     private RunningState _state;
 
@@ -49,7 +47,7 @@ public sealed class AppTile(AppShortcut shortcut, ImageSource? icon, double icon
 
     public Visibility IndicatorVisibility => _state == RunningState.NotRunning ? Visibility.Collapsed : Visibility.Visible;
     public double IndicatorWidth => _state == RunningState.Focused ? 16 : 6;
-    public Brush IndicatorBrush => _state == RunningState.Focused ? FocusedBrush : RunningBrush;
+    public Brush IndicatorBrush => new SolidColorBrush(TaskbarTheme.Color(_state == RunningState.Focused ? "TgIndicatorFocused" : "TgIndicatorRunning"));
 
     public AppShortcut Shortcut => shortcut;
     public string Name => shortcut.Name;

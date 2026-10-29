@@ -39,11 +39,28 @@ public sealed partial class StripWindow : Window
         // Apps starting and closing don't tell us, so look again every second (foreground changes refresh at once).
         var timer = DispatcherQueue.CreateTimer();
         timer.Interval = TimeSpan.FromSeconds(1);
-        timer.Tick += (_, _) => RefreshRunning();
+        timer.Tick += (_, _) =>
+        {
+            TaskbarTheme.Refresh();
+            RefreshRunning();
+        };
         timer.Start();
+
+        // Follow the taskbar's light/dark setting, live.
+        Root.RequestedTheme = TaskbarTheme.Element;
+        TaskbarTheme.Changed += ApplyTheme;
     }
 
     public nint Handle { get; }
+
+    private void ApplyTheme()
+    {
+        Root.RequestedTheme = TaskbarTheme.Element;
+        // Labels and bars take their colours when bound, so bind them again.
+        var groups = Pills.ItemsSource;
+        Pills.ItemsSource = null;
+        Pills.ItemsSource = groups;
+    }
 
     public FrameworkElement RootElement => Root;
 
