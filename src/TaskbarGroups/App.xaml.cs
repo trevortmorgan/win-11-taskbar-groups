@@ -1,7 +1,9 @@
+using System.Diagnostics;
 using System.IO;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using TaskbarGroups.Config;
+using TaskbarGroups.Shell;
 
 namespace TaskbarGroups;
 
@@ -14,6 +16,7 @@ public partial class App : Application
     private FileSystemWatcher? _configWatcher;
     private DispatcherQueueTimer? _reloadTimer;
     private SettingsWindow? _settings;
+    private TrayIcon? _tray;
 
     public App()
     {
@@ -34,11 +37,54 @@ public partial class App : Application
 
         _store = new ConfigStore(ConfigPathFromArgs() ?? ConfigStore.DefaultPath);
         _strip = new StripWindow();
-        _strip.Closed += (_, _) => _host?.Dispose();
+        _strip.Closed += (_, _) =>
+        {
+            _tray?.Dispose();
+            _host?.Dispose();
+        };
         _host = new TaskbarHost(_strip);
 
         _ = LoadGroupsAsync();
         WatchConfigFile();
+        CreateTrayIcon();
+    }
+
+    /// <summary>The notification-area icon: the way back in when the strip is hidden (no room, fullscreen app).</summary>
+    private void CreateTrayIcon()
+    {
+        try
+        {
+            _tray = new TrayIcon("Taskbar Groups", Environment.ProcessPath, BuildTrayMenu);
+            _tray.Selected += ShowSettings;
+        }
+        catch (Exception ex)
+        {
+            // The strip works without it, so don't refuse to start.
+            Log.Error("Couldn't add the tray icon", ex);
+        }
+    }
+
+    private IReadOnlyList<TrayMenuItem> BuildTrayMenu() =>
+    [
+        new("Settings", ShowSettings),
+        new("Show on taskbar", () => _host!.UserHidden = !_host.UserHidden, Checked: !_host!.UserHidden),
+        TrayMenuItem.Separator,
+        new("Edit groups file", () => OpenShell(_store!.Path)),
+        new("Open log folder", () => OpenShell(Log.Directory)),
+        TrayMenuItem.Separator,
+        new("Exit", Exit),
+    ];
+
+    private static void OpenShell(string path)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(path) { UseShellExecute = true })?.Dispose();
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"Couldn't open {path}", ex);
+        }
     }
 
     /// <summary>Opens the settings window, or brings it forward if it's already open.</summary>
