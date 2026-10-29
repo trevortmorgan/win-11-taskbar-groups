@@ -1,0 +1,49 @@
+// UI Automation (reading the taskbar's buttons)
+CUIAutomation
+IUIAutomation
+IUIAutomationElement
+IUIAutomationElementArray
+IUIAutomationCacheRequest
+CoCreateInstance
+TreeScope
+UIA_PROPERTY_ID
+UIA_CONTROLTYPE_ID
+
+// Finding the taskbar and its monitor
+FindWindow
+GetWindowRect
+MonitorFromWindow
+GetMonitorInfo
+GetDpiForWindow
+SHQueryUserNotificationState
+
+// Placing and styling our window
+SetWindowPos
+GetWindowLong
+SetWindowLong
+DwmSetWindowAttribute
+DwmEnableBlurBehindWindow
+CreateRectRgn
+DeleteObject
+DWMWINDOWATTRIBUTE
+DWM_WINDOW_CORNER_PREFERENCE
+
+// Re-asserting z-order when the taskbar is clicked
+SetWinEventHook
+UnhookWinEvent
+EVENT_SYSTEM_FOREGROUND
+GetForegroundWindow
+
+WINDOW_EX_STYLE
+WINEVENT_OUTOFCONTEXT
+WINEVENT_SKIPOWNPROCESS
+DWM_BB_ENABLE
+DWM_BB_BLURREGION
+
+// Windows.UI.Composition needs a system DispatcherQueue on the UI thread
+CreateDispatcherQueueController
+
+// Keeping WinUI from re-adding its window frame
+SetWindowSubclass
+DefSubclassProc
+WM_NCCALCSIZE
