@@ -46,6 +46,13 @@ Settings are stored in `%APPDATA%\TaskbarGroups\groups.json`, and you can still 
 
 To try a different file without touching yours, run `TaskbarGroups.exe --config path\to\groups.json`.
 
+## Tip: avoid seeing an app twice
+
+A running app shows up both in its group and as its own button on the taskbar. Windows has no setting to hide a single app's button, and Taskbar Groups doesn't touch other apps' windows, so the button stays. Two Windows settings keep the duplication small:
+
+- **Combine the buttons.** Settings → Personalization → Taskbar → Taskbar behaviors → **Combine taskbar buttons and hide labels** → **Always**. Each running app then costs one taskbar button, however many windows it has.
+- **Unpin apps that are in a group.** A pinned app appears twice even when it isn't running (the pin plus the group's icon). Once it's unpinned, its taskbar button only exists while it runs: right-click the button → *Unpin from taskbar*.
+
 ## Installing a release
 
 1. Download `TaskbarGroups-<version>-win-x64.zip` (or `win-arm64` for ARM PCs) from the [Releases](https://github.com/trevortmorgan/win-11-taskbar-groups/releases) page.
