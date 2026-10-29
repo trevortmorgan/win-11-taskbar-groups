@@ -121,9 +121,9 @@ win-11-taskbar-groups/
 0. **Bootstrap:** git repo and GitHub remote, the `.tools` toolchain scripts, an empty WinUI 3 app that runs, and CI building on push.
 1. **Taskbar spike:** a coloured box that sits reliably on the taskbar. Test A vs B, and cover DPI scaling, auto-hide, Explorer restart (`TaskbarCreated`) and the primary monitor. Then pick the approach.
 2. **Groups from config:** render the wide layout from `groups.json`, show real app icons, and launch apps on click. Each group gets its own icon in place of the coloured dot (§10.1).
-3. **Responsive collapse + multiple monitors:** switch to the "Groups" button and flyout when space runs out, and show groups on every monitor's taskbar. The portrait secondary screen is the test bed for the narrow layout (§10.3).
+3. **Responsive collapse:** switch to the "Groups" button and flyout when space runs out. Test it on the portrait screen (§10.3).
 4. **Settings UI:** add, rename and recolour groups, pick each group's icon, and add apps by browsing or drag-and-drop.
-5. **Polish:** start with Windows, tray menu, running-app indicators, light-theme support, sliding with an auto-hiding taskbar (§10.2), and a release `.exe` attached to GitHub Releases.
+5. **Polish:** start with Windows, tray menu, running-app indicators, light-theme support, multi-monitor, sliding with an auto-hiding taskbar (§10.2), and a release `.exe` attached to GitHub Releases.
 
 ## 7. Decisions
 
@@ -168,9 +168,11 @@ win-11-taskbar-groups/
 - Polling could be replaced with UI Automation structure-change events to cut CPU further.
 - The strip uses a dark theme regardless of the system setting, and the app icons are placeholders (milestone 2).
 
-## 10. Requested features (2026-10-29)
+## 10. Requested features and testing (2026-10-29)
 
-### 10.1 Group icons (milestone 2; picker in milestone 4)
+Each feature is built on its own branch and merged through its own PR.
+
+### 10.1 Group icons (milestone 2; picker in milestone 4). Branch: `feature/group-icons`
 
 Each group shows an icon, e.g. a briefcase for Work, instead of (or alongside) the coloured dot.
 
@@ -181,7 +183,7 @@ Each group shows an icon, e.g. a briefcase for Work, instead of (or alongside) t
 - **Fallback:** the *Segoe Fluent Icons* font that ships with Windows 11 needs no bundling at all, but has fewer icons.
 - **Config:** `groups.json` gains an `icon` field (e.g. `"briefcase"`). The settings UI gets a searchable icon picker.
 
-### 10.2 Slide with an auto-hiding taskbar (milestone 5)
+### 10.2 Slide with an auto-hiding taskbar (milestone 5). Branch: `feature/autohide-slide`
 
 Today the strip simply hides when the taskbar auto-hides. Instead it should slide down and up with the taskbar.
 
@@ -189,11 +191,10 @@ Today the strip simply hides when the taskbar auto-hides. Instead it should slid
 - **To verify first:** that the Windows 11 auto-hide animation really moves the `Shell_TrayWnd` window (rather than only animating its XAML content), and how smoothly we can follow it.
 - **Also:** the strip has to reappear when the mouse reveals the taskbar, and must not keep the taskbar open by itself.
 
-### 10.3 Multiple monitors, tested on the portrait screen (milestone 3)
+### 10.3 Testing on the portrait screen (not a feature)
 
-The second monitor is portrait, about 1080 px wide, so its taskbar has much less room. That makes it the natural place to test the collapsed "Groups" button.
+The second monitor is portrait, about 1080 px wide, so its taskbar has much less room. It's a real-world test of the narrow layout: the pills should collapse into the "Groups" button there.
 
-- **Needs multi-monitor support first.** Today only the primary taskbar (`Shell_TrayWnd`) is used. Secondary taskbars are `Shell_SecondaryTrayWnd` windows, one per monitor, shown only when "Show my taskbar on all displays" is on.
-- **Design:** one strip window per taskbar, each with its own `TaskbarProbe` reading and gap. Each monitor collapses or hides independently.
-- **Per-monitor fullscreen:** the fullscreen check becomes per monitor as well (see the §9 follow-up).
-- **Things to test there:** different DPI between the screens, the collapsed layout, and plugging or unplugging the monitor.
+- **How to test today:** the strip only appears on the main display's taskbar (`Shell_TrayWnd`). Temporarily make the portrait screen the main display (Settings → System → Display → "Make this my main display"), then switch back afterwards.
+- **What to check:** that it collapses correctly; that DPI is right if the two screens use different scaling; and that nothing goes wrong when the main display is switched while the app is running.
+- **Later:** once multi-monitor support lands (milestone 5), the same checks run with the portrait screen as a secondary display.
