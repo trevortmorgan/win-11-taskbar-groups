@@ -1,4 +1,4 @@
-using TaskbarGroups.Windows;
+using TaskbarGroups.Switching;
 
 namespace TaskbarGroups.Tests;
 

@@ -5,7 +5,7 @@ using Windows.Win32.System.Threading;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Windows.Win32.UI.Shell.PropertiesSystem;
 using Windows.Win32.UI.WindowsAndMessaging;
-using TaskbarGroups.Windows;
+using TaskbarGroups.Switching;
 
 namespace TaskbarGroups.Shell;
 
@@ -123,10 +123,10 @@ public static class WindowSwitcher
         if (process.IsInvalid)
             return null;
 
-        var buffer = stackalloc char[1024];
-        uint length = 1024;
+        Span<char> buffer = stackalloc char[1024];
+        uint length = (uint)buffer.Length;
         return PInvoke.QueryFullProcessImageName(process, PROCESS_NAME_FORMAT.PROCESS_NAME_WIN32, buffer, ref length)
-            ? new string(buffer, 0, (int)length)
+            ? new string(buffer[..(int)length])
             : null;
     }
 }

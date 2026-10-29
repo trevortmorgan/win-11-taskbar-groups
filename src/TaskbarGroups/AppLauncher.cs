@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using TaskbarGroups.Config;
 using TaskbarGroups.Shell;
-using TaskbarGroups.Windows;
+using TaskbarGroups.Switching;
 
 namespace TaskbarGroups;
 

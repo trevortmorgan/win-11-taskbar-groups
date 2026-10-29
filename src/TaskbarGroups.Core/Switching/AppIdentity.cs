@@ -1,4 +1,4 @@
-namespace TaskbarGroups.Windows;
+namespace TaskbarGroups.Switching;
 
 /// <summary>
 /// How to recognise a shortcut's running windows: by AppUserModelID (how the taskbar groups windows) for Store apps
