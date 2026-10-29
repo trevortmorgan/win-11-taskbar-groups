@@ -183,6 +183,16 @@ public sealed partial class GroupsFlyout : Window
         }
     }
 
+    private void OnAppLoaded(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button)
+            MiddleClick.Attach(button, tile =>
+            {
+                AppLauncher.Launch(tile.Shortcut);
+                Dismiss();
+            });
+    }
+
     private void OnAppClick(object sender, RoutedEventArgs e)
     {
         if (sender is FrameworkElement { Tag: AppTile tile })
