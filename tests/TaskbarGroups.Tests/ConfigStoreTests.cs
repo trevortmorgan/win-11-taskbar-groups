@@ -22,6 +22,27 @@ public sealed class ConfigStoreTests
     }
 
     [TestMethod]
+    public void LoadOrCreate_WhenNoFile_WritesSampleToDisk()
+    {
+        var path = Path.Combine(_dir, "groups.json");
+        var store = new ConfigStore(path);
+
+        var loaded = store.LoadOrCreate();
+
+        Assert.IsTrue(File.Exists(path));
+        Assert.HasCount(GroupsConfig.Sample.Groups.Count, loaded.Groups);
+        Assert.AreEqual(GroupsConfig.Sample.Groups[0].Apps[0], loaded.Groups[0].Apps[0]);
+    }
+
+    [TestMethod]
+    public void ResolvePath_ExpandsEnvironmentVariables()
+    {
+        var app = new AppShortcut("Explorer", @"%WINDIR%\explorer.exe");
+
+        Assert.AreEqual(Path.Combine(Environment.GetEnvironmentVariable("WINDIR")!, "explorer.exe"), app.ResolvePath());
+    }
+
+    [TestMethod]
     public void SaveThenLoad_RoundTripsGroups()
     {
         var store = new ConfigStore(Path.Combine(_dir, "nested", "groups.json"));

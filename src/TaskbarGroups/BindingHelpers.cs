@@ -22,9 +22,6 @@ public static class BindingHelpers
         return new SolidColorBrush(ColorHelper.FromArgb(0xFF, Mix(c.R), Mix(c.G), Mix(c.B)));
     }
 
-    /// <summary>First letter of a name. A stand-in until real app icons arrive in milestone 2.</summary>
-    public static string Initial(string name) => string.IsNullOrEmpty(name) ? "?" : name[..1].ToUpperInvariant();
-
     private static Color Parse(string hex)
     {
         if (hex is ['#', ..] && hex.Length == 7 && uint.TryParse(hex.AsSpan(1), NumberStyles.HexNumber, null, out var rgb))

@@ -168,6 +168,19 @@ win-11-taskbar-groups/
 - Polling could be replaced with UI Automation structure-change events to cut CPU further.
 - The strip uses a dark theme regardless of the system setting, and the app icons are placeholders (milestone 2).
 
+## 9a. Milestone 2 notes (app icons and launching)
+
+- **Icons** come from the Shell's `IShellItemImageFactory` (`Shell/ShellIcons`). That gives the same icon Windows shows for an `.exe`, `.lnk`, folder, URL or `shell:AppsFolder\<AppID>` Store app.
+  - They're loaded on a dedicated STA thread, because some icon handlers need STA.
+  - They're converted to a `WriteableBitmap` on the UI thread.
+  - Old icons with no alpha channel come back fully transparent, so they're made opaque.
+- **Sharpness:** request the icon at *exactly* the pixel size it will occupy (24 DIP × monitor scale), without `SIIGBF_BIGGERSIZEOK`, and display it at `px / scale` DIPs so XAML doesn't rescale it.
+  - The first version took the Shell's nearest stock size (32 px) and let XAML shrink it to 30 px, which looked soft.
+  - Icon size is computed once at load, so it won't update if the strip moves to a monitor with a different scale. Revisit with multi-monitor support.
+- **Launching:** `Process.Start` with `UseShellExecute = true` is the same path as the Run box, so every kind of `path` above works. Launched apps come to the front, even though the strip itself never takes focus (`WS_EX_NOACTIVATE`).
+- **Config:** `groups.json` is created from the sample on first run and reloaded about 400 ms after any save (`FileSystemWatcher`). Invalid JSON is logged and ignored.
+- **Testing:** clicks were tested by invoking the buttons through UI Automation, which fires the same `Click` handler. A real mouse click still needs checking by hand.
+
 ## 10. Requested features and testing (2026-10-29)
 
 Each feature is built on its own branch and merged through its own PR.
@@ -198,3 +211,10 @@ The second monitor is portrait, about 1080 px wide, so its taskbar has much less
 - **How to test today:** the strip only appears on the main display's taskbar (`Shell_TrayWnd`). Temporarily make the portrait screen the main display (Settings → System → Display → "Make this my main display"), then switch back afterwards.
 - **What to check:** that it collapses correctly; that DPI is right if the two screens use different scaling; and that nothing goes wrong when the main display is switched while the app is running.
 - **Later:** once multi-monitor support lands (milestone 5), the same checks run with the portrait screen as a secondary display.
+
+### 10.4 Test: groups overflowing into the system tray / clock area (not a feature)
+
+Add two or more groups (ideally with several items each) and check what happens when the strip grows wide enough to reach the notification area and clock at the far end of the taskbar.
+
+- **What to check:** that the strip never overlaps or covers the tray icons and clock; that it stops at the tray's left edge and falls back to the collapsed "Groups" button (§ responsive collapse) instead of spilling over; and that it recovers when groups are removed or the tray gains or loses icons.
+- **Also try:** with the taskbar centred and left-aligned, and with many pinned apps, since the free space differs.

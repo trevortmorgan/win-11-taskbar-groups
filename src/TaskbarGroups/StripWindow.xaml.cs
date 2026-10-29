@@ -10,10 +10,12 @@ namespace TaskbarGroups;
 /// <summary>The borderless, transparent strip that sits on the taskbar and shows the groups.</summary>
 public sealed partial class StripWindow : Window
 {
-    public StripWindow(IReadOnlyList<Group> groups)
+    /// <summary>App icon size, the same as Windows' own taskbar icons.</summary>
+    private const double IconDips = 24;
+
+    public StripWindow()
     {
         InitializeComponent();
-        Pills.ItemsSource = groups;
 
         SystemBackdrop = new TransparentBackdrop();
         var presenter = OverlappedPresenter.Create();
@@ -31,6 +33,23 @@ public sealed partial class StripWindow : Window
     public nint Handle { get; }
 
     public FrameworkElement RootElement => Root;
+
+    /// <summary>Shows these groups, with each app's real icon. Call on the UI thread.</summary>
+    public async Task SetGroupsAsync(IReadOnlyList<Group> groups)
+    {
+        // Load icons at exactly the screen pixels they'll occupy, and display them at that size in DIPs, so there's
+        // no further scaling (which is what makes icons look soft).
+        var scale = WindowChrome.GetDpi(Handle) / 96.0;
+        var sizePx = (int)Math.Round(IconDips * scale);
+        var sizeDips = sizePx / scale;
+        var icons = await IconLoader.LoadAsync(groups.SelectMany(g => g.Apps).Select(a => a.ResolvePath()), sizePx);
+
+        Pills.ItemsSource = groups
+            .Select(g => new GroupView(g, g.Apps
+                .Select(a => new AppTile(a, icons.GetValueOrDefault(a.ResolvePath()) is { } icon ? IconLoader.ToBitmap(icon) : null, sizeDips))
+                .ToList()))
+            .ToList();
+    }
 
     /// <summary>Wide pills, or the single "Groups" button.</summary>
     public bool IsCollapsed
@@ -54,6 +73,12 @@ public sealed partial class StripWindow : Window
             return null;
         element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
         return element.DesiredSize.Width;
+    }
+
+    private void OnAppClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { Tag: AppTile tile })
+            AppLauncher.Launch(tile.Shortcut);
     }
 
     private void OnExitClick(object sender, RoutedEventArgs e) => Application.Current.Exit();

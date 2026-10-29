@@ -95,6 +95,12 @@ internal sealed class TaskbarHost : IDisposable
             return;
         }
 
+        if (fullWidth.Value <= 0)
+        {
+            Hide("no groups to show"); // still loading, or the config has none
+            return;
+        }
+
         var full = (int)Math.Ceiling(fullWidth.Value * scale);
         var compact = (int)Math.Ceiling(compactWidth.Value * scale);
         if (TaskbarGapFinder.PickGap(gaps, taskbar.AppButtonsRight, compact) is not { } gap)

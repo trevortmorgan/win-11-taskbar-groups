@@ -2,7 +2,35 @@
 
 Colour-coded groups of app shortcuts on the Windows 11 taskbar. When space runs out they collapse into a single **Groups** flyout. See [`design/`](design/) for the mockups and [`docs/project-plan.md`](docs/project-plan.md) for the plan.
 
-**Status:** milestone 1 (taskbar spike). The groups appear as pills in the free space on the taskbar, but clicking them doesn't do anything yet. To quit, right-click the strip → *Exit*. The log is at `%LOCALAPPDATA%\TaskbarGroups\taskbargroups.log`. To try a different groups file, run `TaskbarGroups.exe --config path\to\groups.json`.
+**Status:** milestone 2. The groups sit in the free space on the taskbar, show each app's real icon, and launch the app when you click it. To quit, right-click the strip → *Exit*. The log is at `%LOCALAPPDATA%\TaskbarGroups\taskbargroups.log`.
+
+## Setting up your groups
+
+Until the settings screen exists (milestone 4), you edit the groups file by hand: `%APPDATA%\TaskbarGroups\groups.json`. A sample is written there on first run. The strip reloads as soon as you save. If the file has a mistake in it, the current groups stay on screen and the error goes in the log.
+
+```json
+{
+  "groups": [
+    {
+      "name": "Work",
+      "color": "#3B82F6",
+      "apps": [
+        { "name": "File Explorer", "path": "shell:AppsFolder\\Microsoft.Windows.Explorer" },
+        { "name": "Reports", "path": "D:\\Reports" },
+        { "name": "VS Code", "path": "%LOCALAPPDATA%\\Programs\\Microsoft VS Code\\Code.exe", "arguments": "--new-window" }
+      ]
+    }
+  ]
+}
+```
+
+- **`color`** is `#RRGGBB`.
+- **`path`** is anything you could type into the Run box (Win+R): an `.exe`, a `.lnk` shortcut, a folder, a URL, or a Store app as `shell:AppsFolder\<AppID>`. Environment variables like `%LOCALAPPDATA%` work.
+- **Finding App IDs:** in PowerShell, run `Get-StartApps` to list the App ID of every app in the Start menu, including Store apps.
+- **`arguments`** is optional.
+- **Backslashes** must be doubled in JSON.
+
+To try a different file without touching yours, run `TaskbarGroups.exe --config path\to\groups.json`.
 
 ## Stack
 

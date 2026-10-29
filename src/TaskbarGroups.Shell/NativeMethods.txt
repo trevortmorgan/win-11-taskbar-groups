@@ -47,3 +47,17 @@ CreateDispatcherQueueController
 SetWindowSubclass
 DefSubclassProc
 WM_NCCALCSIZE
+
+// App icons via the Shell (works for .exe, .lnk, folders and Store apps)
+SHCreateItemFromParsingName
+IShellItem
+IShellItemImageFactory
+SIIGBF
+GetObject
+BITMAP
+GetDIBits
+BITMAPINFO
+CreateCompatibleDC
+DeleteDC
+DIB_USAGE
+BI_COMPRESSION
