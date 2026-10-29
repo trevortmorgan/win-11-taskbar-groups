@@ -1,7 +1,10 @@
+using System.ComponentModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using TaskbarGroups.Config;
 using TaskbarGroups.Icons;
+using TaskbarGroups.Switching;
+using Windows.UI;
 
 namespace TaskbarGroups;
 
@@ -17,8 +20,37 @@ public sealed class GroupView(Group group, GroupIcon? icon, IReadOnlyList<AppTil
 }
 
 /// <summary>One clickable app in a group: its real icon, or its initial if Windows has no icon for it.</summary>
-public sealed class AppTile(AppShortcut shortcut, ImageSource? icon, double iconSize)
+public sealed class AppTile(AppShortcut shortcut, ImageSource? icon, double iconSize) : INotifyPropertyChanged
 {
+    // Windows 11's taskbar: a short grey bar while running, a longer accent-coloured one for the app in front
+    // (.active-dot and .active-dot.focus in design/taskbar_groups.html).
+    private static readonly SolidColorBrush RunningBrush = new(Color.FromArgb(0xFF, 0xD1, 0xD5, 0xDB));
+    private static readonly SolidColorBrush FocusedBrush = new(Color.FromArgb(0xFF, 0x60, 0xA5, 0xFA));
+
+    private RunningState _state;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    /// <summary>Who to look for among the open windows.</summary>
+    public AppIdentity Identity { get; } = AppIdentity.Parse(shortcut.ResolvePath());
+
+    public RunningState State
+    {
+        get => _state;
+        set
+        {
+            if (_state == value)
+                return;
+            _state = value;
+            foreach (var name in new[] { nameof(IndicatorVisibility), nameof(IndicatorWidth), nameof(IndicatorBrush) })
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+    }
+
+    public Visibility IndicatorVisibility => _state == RunningState.NotRunning ? Visibility.Collapsed : Visibility.Visible;
+    public double IndicatorWidth => _state == RunningState.Focused ? 16 : 6;
+    public Brush IndicatorBrush => _state == RunningState.Focused ? FocusedBrush : RunningBrush;
+
     public AppShortcut Shortcut => shortcut;
     public string Name => shortcut.Name;
     public ImageSource? Icon => icon;

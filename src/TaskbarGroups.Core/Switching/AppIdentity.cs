@@ -22,7 +22,29 @@ public sealed record AppIdentity(string? Aumid, string? ExePath)
     public bool Matches(string? windowAumid, string? windowExePath) =>
         (Aumid is not null && string.Equals(Aumid, windowAumid, StringComparison.OrdinalIgnoreCase))
         || (ExePath is not null && string.Equals(ExePath, windowExePath, StringComparison.OrdinalIgnoreCase));
+
+    /// <summary>Whether any of the open windows belong to this app, and whether one of them is in front.</summary>
+    public RunningState StateIn(IReadOnlyList<WindowInfo> windows, nint foreground)
+    {
+        if (this is { Aumid: null, ExePath: null })
+            return RunningState.NotRunning;
+        var state = RunningState.NotRunning;
+        foreach (var window in windows)
+        {
+            if (!Matches(window.Aumid, window.ExePath))
+                continue;
+            if (window.Handle == foreground)
+                return RunningState.Focused;
+            state = RunningState.Running;
+        }
+        return state;
+    }
 }
+
+/// <summary>A window that has a taskbar button, with what's needed to tell which app it belongs to.</summary>
+public readonly record struct WindowInfo(nint Handle, string? Aumid, string? ExePath);
+
+public enum RunningState { NotRunning, Running, Focused }
 
 public enum ClickKind { Launch, Activate, Minimize }
 

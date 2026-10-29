@@ -53,6 +53,7 @@ internal sealed class TaskbarHost : IDisposable
     {
         if (_placedAt is not null)
             WindowChrome.BringToTop(_window.Handle);
+        _window.RefreshRunning();
         _ = UpdateAsync(); // e.g. a fullscreen game just came to the front
     }
 

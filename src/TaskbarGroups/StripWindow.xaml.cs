@@ -34,6 +34,12 @@ public sealed partial class StripWindow : Window
 
         Handle = Win32Interop.GetWindowFromWindowId(AppWindow.Id);
         WindowChrome.MakeOverlay(Handle);
+
+        // Apps starting and closing don't tell us, so look again every second (foreground changes refresh at once).
+        var timer = DispatcherQueue.CreateTimer();
+        timer.Interval = TimeSpan.FromSeconds(1);
+        timer.Tick += (_, _) => RefreshRunning();
+        timer.Start();
     }
 
     public nint Handle { get; }
@@ -59,6 +65,32 @@ public sealed partial class StripWindow : Window
                 .ToList()))
             .ToList();
         _flyout?.SetGroups(GroupViews);
+        RefreshRunning();
+    }
+
+    /// <summary>
+    /// Updates the running / in-front bars under each app. Cheap enough to call often: one pass over the open
+    /// windows however many apps there are. Call on the UI thread.
+    /// </summary>
+    public void RefreshRunning()
+    {
+        var tiles = GroupViews.SelectMany(g => g.Apps).ToList();
+        if (tiles.Count == 0)
+            return;
+        try
+        {
+            var windows = WindowSwitcher.Snapshot();
+            var foreground = WindowChrome.GetForeground();
+            foreach (var tile in tiles)
+            {
+                var s = tile.Identity.StateIn(windows, foreground);
+                tile.State = s;
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Couldn't check which apps are running", ex);
+        }
     }
 
     private IReadOnlyList<GroupView> GroupViews => Pills.ItemsSource as IReadOnlyList<GroupView> ?? [];

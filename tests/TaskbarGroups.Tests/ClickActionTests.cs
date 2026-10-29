@@ -39,3 +39,32 @@ public class ClickActionTests
         Assert.IsFalse(AppIdentity.Parse(@"C:\Docs").Matches(null, null));
     }
 }
+
+[TestClass]
+public class RunningStateTests
+{
+    private static readonly AppIdentity Notepad = new(null, @"C:\Windows\notepad.exe");
+
+    private static WindowInfo Win(nint handle, string exe) => new(handle, null, exe);
+
+    [TestMethod]
+    public void NoMatchingWindow_NotRunning() =>
+        Assert.AreEqual(RunningState.NotRunning, Notepad.StateIn([Win(1, @"C:\other.exe")], foreground: 1));
+
+    [TestMethod]
+    public void MatchingWindowInBackground_Running() =>
+        Assert.AreEqual(RunningState.Running, Notepad.StateIn([Win(1, @"c:\windows\NOTEPAD.exe")], foreground: 9));
+
+    [TestMethod]
+    public void MatchingWindowInFront_Focused() =>
+        Assert.AreEqual(RunningState.Focused, Notepad.StateIn([Win(2, @"C:\Windows\notepad.exe"), Win(1, @"C:\Windows\notepad.exe")], foreground: 1));
+
+    [TestMethod]
+    public void StoreApp_MatchesByAumid() =>
+        Assert.AreEqual(RunningState.Running,
+            new AppIdentity("Pkg!App", null).StateIn([new WindowInfo(1, "pkg!app", null)], foreground: 9));
+
+    [TestMethod]
+    public void UnknownIdentity_NeverRunning() =>
+        Assert.AreEqual(RunningState.NotRunning, new AppIdentity(null, null).StateIn([new WindowInfo(1, null, null)], foreground: 1));
+}

@@ -54,12 +54,15 @@
                                             </ItemsControl.ItemsPanel>
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate x:DataType="local:AppTile">
-                                                    <Button Width="40" Height="40" Padding="0" CornerRadius="8" Tag="{x:Bind}" Click="OnAppClick"
+                                                    <Button Width="40" Height="40" Padding="0" CornerRadius="8" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Tag="{x:Bind}" Click="OnAppClick"
                                                             ToolTipService.ToolTip="{x:Bind Name}" AutomationProperties.Name="{x:Bind Name}">
                                                         <Grid>
                                                             <Image Source="{x:Bind Icon}" Width="{x:Bind IconSize}" Height="{x:Bind IconSize}" Stretch="Uniform" />
                                                             <TextBlock Text="{x:Bind Initial}" Visibility="{x:Bind InitialVisibility}" FontSize="14"
                                                                        HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                            <Border Height="3" CornerRadius="1.5" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,2"
+                                                                    Visibility="{x:Bind IndicatorVisibility, Mode=OneWay}" Width="{x:Bind IndicatorWidth, Mode=OneWay}"
+                                                                    Background="{x:Bind IndicatorBrush, Mode=OneWay}" IsHitTestVisible="False" />
                                                         </Grid>
                                                     </Button>
                                                 </DataTemplate>
