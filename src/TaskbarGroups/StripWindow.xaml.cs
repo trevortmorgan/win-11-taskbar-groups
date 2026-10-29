@@ -139,5 +139,7 @@ public sealed partial class StripWindow : Window
     /// <summary>Closes the flyout, e.g. because the strip is being hidden or there's room for the pills again.</summary>
     public void CloseFlyout() => _flyout?.Dismiss();
 
+    private void OnSettingsClick(object sender, RoutedEventArgs e) => ((App)Application.Current).ShowSettings();
+
     private void OnExitClick(object sender, RoutedEventArgs e) => Application.Current.Exit();
 }
