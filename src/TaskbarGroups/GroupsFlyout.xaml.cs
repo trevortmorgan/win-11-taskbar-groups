@@ -43,6 +43,15 @@ public sealed partial class GroupsFlyout : Window
         Handle = Win32Interop.GetWindowFromWindowId(AppWindow.Id);
         WindowChrome.MakePopup(Handle);
 
+        Root.RequestedTheme = TaskbarTheme.Element;
+        TaskbarTheme.Changed += () =>
+        {
+            Root.RequestedTheme = TaskbarTheme.Element;
+            var groups = GroupList.ItemsSource;
+            GroupList.ItemsSource = null;
+            GroupList.ItemsSource = groups;
+        };
+
         Activated += OnActivated;
         AppWindow.Closing += (_, e) =>
         {

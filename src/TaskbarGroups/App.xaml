@@ -10,7 +10,40 @@
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
                 <!-- Other merged dictionaries here -->
             </ResourceDictionary.MergedDictionaries>
-            <!-- Other app resources here -->
+            <!-- The taskbar surfaces' palette (strip, Groups button, flyout, running bars). A theme is a swap of these. -->
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="TgHover" Color="#1AFFFFFF" />
+                    <SolidColorBrush x:Key="TgPressed" Color="#0FFFFFFF" />
+                    <SolidColorBrush x:Key="TgCollapsedBackground" Color="#991F2937" />
+                    <SolidColorBrush x:Key="TgCollapsedBackgroundHover" Color="#CC374151" />
+                    <SolidColorBrush x:Key="TgCollapsedBackgroundPressed" Color="#B31F2937" />
+                    <SolidColorBrush x:Key="TgCollapsedBorder" Color="#806B7280" />
+                    <SolidColorBrush x:Key="TgAccent" Color="#60A5FA" />
+                    <SolidColorBrush x:Key="TgFlyoutBorder" Color="#804B5563" />
+                    <SolidColorBrush x:Key="TgFlyoutTint" Color="#99111827" />
+                    <SolidColorBrush x:Key="TgCard" Color="#0DFFFFFF" />
+                    <SolidColorBrush x:Key="TgIndicatorRunning" Color="#D1D5DB" />
+                    <SolidColorBrush x:Key="TgIndicatorFocused" Color="#60A5FA" />
+                    <!-- Group colours for labels are mixed 45% towards this (see BindingHelpers.Light). -->
+                    <SolidColorBrush x:Key="TgLabelMixTarget" Color="#FFFFFF" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="TgHover" Color="#0F000000" />
+                    <SolidColorBrush x:Key="TgPressed" Color="#08000000" />
+                    <SolidColorBrush x:Key="TgCollapsedBackground" Color="#B3FFFFFF" />
+                    <SolidColorBrush x:Key="TgCollapsedBackgroundHover" Color="#E6FFFFFF" />
+                    <SolidColorBrush x:Key="TgCollapsedBackgroundPressed" Color="#CCFFFFFF" />
+                    <SolidColorBrush x:Key="TgCollapsedBorder" Color="#33000000" />
+                    <SolidColorBrush x:Key="TgAccent" Color="#2563EB" />
+                    <SolidColorBrush x:Key="TgFlyoutBorder" Color="#33000000" />
+                    <SolidColorBrush x:Key="TgFlyoutTint" Color="#B3F3F4F6" />
+                    <SolidColorBrush x:Key="TgCard" Color="#0A000000" />
+                    <SolidColorBrush x:Key="TgIndicatorRunning" Color="#6B7280" />
+                    <SolidColorBrush x:Key="TgIndicatorFocused" Color="#2563EB" />
+                    <SolidColorBrush x:Key="TgLabelMixTarget" Color="#000000" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -8,26 +8,30 @@
 
     <!-- Opens above the "Groups" button and lists every group (see #mobile-flyout in design/taskbar_groups.html).
          The window itself is transparent; the rounded acrylic panel is drawn by Panel. -->
-    <Grid x:Name="Root" Background="Transparent" RequestedTheme="Dark" KeyDown="OnKeyDown" PreviewKeyDown="OnPreviewKeyDown"
+    <Grid x:Name="Root" Background="Transparent" KeyDown="OnKeyDown" PreviewKeyDown="OnPreviewKeyDown"
           TabFocusNavigation="Cycle">
         <Grid.Resources>
+            <ResourceDictionary>
             <SolidColorBrush x:Key="ButtonBackground" Color="Transparent" />
-            <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#1AFFFFFF" />
-            <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#0FFFFFFF" />
             <SolidColorBrush x:Key="ButtonBorderBrush" Color="Transparent" />
             <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="Transparent" />
             <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="Transparent" />
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Dark"><StaticResource x:Key="ButtonBackgroundPointerOver" ResourceKey="TgHover" /><StaticResource x:Key="ButtonBackgroundPressed" ResourceKey="TgPressed" /></ResourceDictionary>
+                <ResourceDictionary x:Key="Light"><StaticResource x:Key="ButtonBackgroundPointerOver" ResourceKey="TgHover" /><StaticResource x:Key="ButtonBackgroundPressed" ResourceKey="TgPressed" /></ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
         </Grid.Resources>
 
         <Border x:Name="Panel" Width="288" VerticalAlignment="Bottom" CornerRadius="16"
-                BorderBrush="#804B5563" BorderThickness="1">
+                BorderBrush="{ThemeResource TgFlyoutBorder}" BorderThickness="1">
             <Grid>
                 <SystemBackdropElement CornerRadius="16">
                     <SystemBackdropElement.SystemBackdrop>
                         <DesktopAcrylicBackdrop />
                     </SystemBackdropElement.SystemBackdrop>
                 </SystemBackdropElement>
-                <Rectangle Fill="#99111827" />
+                <Rectangle Fill="{ThemeResource TgFlyoutTint}" />
 
                 <ScrollViewer x:Name="Scroller" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
                     <ItemsControl x:Name="GroupList" Margin="16" IsTabStop="False">
@@ -44,7 +48,7 @@
                                         <TextBlock Text="{x:Bind Name}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"
                                                    Foreground="{x:Bind local:BindingHelpers.Light(Color)}" />
                                     </StackPanel>
-                                    <Border Padding="6" CornerRadius="12" Background="#0DFFFFFF" BorderBrush="#0DFFFFFF" BorderThickness="1">
+                                    <Border Padding="6" CornerRadius="12" Background="{ThemeResource TgCard}" BorderBrush="{ThemeResource TgCard}" BorderThickness="1">
                                         <ItemsControl ItemsSource="{x:Bind Apps}" IsTabStop="False">
                                             <ItemsControl.ItemsPanel>
                                                 <ItemsPanelTemplate>
