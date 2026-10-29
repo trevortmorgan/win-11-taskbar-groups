@@ -1,6 +1,7 @@
 using System.Numerics;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
 using TaskbarGroups.Config;
 using TaskbarGroups.Icons;
@@ -128,6 +129,12 @@ public sealed partial class StripWindow : Window
             return null;
         element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
         return element.DesiredSize.Width;
+    }
+
+    private void OnAppLoaded(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button)
+            MiddleClick.Attach(button, tile => AppLauncher.Launch(tile.Shortcut));
     }
 
     private void OnAppClick(object sender, RoutedEventArgs e)

@@ -58,7 +58,7 @@
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="local:AppTile">
-                                        <Button Width="36" Height="36" Padding="0" CornerRadius="6" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Tag="{x:Bind}" Click="OnAppClick"
+                                        <Button Width="36" Height="36" Padding="0" CornerRadius="6" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Tag="{x:Bind}" Click="OnAppClick" Loaded="OnAppLoaded"
                                                 ToolTipService.ToolTip="{x:Bind Name}" AutomationProperties.Name="{x:Bind Name}">
                                             <Grid>
                                                 <Image Source="{x:Bind Icon}" Width="{x:Bind IconSize}" Height="{x:Bind IconSize}" Stretch="Uniform" />

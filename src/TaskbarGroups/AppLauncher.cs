@@ -10,7 +10,7 @@ internal static class AppLauncher
 {
     /// <summary>
     /// What a click on an app does, like a pinned taskbar button: switch to it if it's running (minimising it if it's
-    /// already in front), otherwise launch it. Shift+click always opens a new window.
+    /// already in front), otherwise launch it. Shift+click or middle-click always opens a new window.
     /// <paramref name="front"/> is the window the user was working in, when that's no longer the foreground window.
     /// </summary>
     public static void Open(AppShortcut app, nint front = 0)
