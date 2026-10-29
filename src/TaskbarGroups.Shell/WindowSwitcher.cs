@@ -39,6 +39,18 @@ public static class WindowSwitcher
         return found;
     }
 
+    /// <summary>Every window with a taskbar button, in one pass, for checking many apps at once.</summary>
+    public static List<WindowInfo> Snapshot()
+    {
+        var found = new List<WindowInfo>();
+        for (var h = PInvoke.GetTopWindow(HWND.Null); h != HWND.Null; h = PInvoke.GetWindow(h, GET_WINDOW_CMD.GW_HWNDNEXT))
+        {
+            if (HasTaskbarButton(h))
+                found.Add(new WindowInfo(h, GetAumid(h), GetExePath(h)));
+        }
+        return found;
+    }
+
     /// <summary>True while Shift is held: the Windows convention for "open a new window".</summary>
     public static bool IsShiftDown() => (PInvoke.GetAsyncKeyState((int)VIRTUAL_KEY.VK_SHIFT) & 0x8000) != 0;
 

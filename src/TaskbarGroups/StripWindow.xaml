@@ -64,6 +64,10 @@
                                                 <Image Source="{x:Bind Icon}" Width="{x:Bind IconSize}" Height="{x:Bind IconSize}" Stretch="Uniform" />
                                                 <TextBlock Text="{x:Bind Initial}" Visibility="{x:Bind InitialVisibility}" FontSize="13"
                                                            HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                <!-- Running: short grey bar; in front: longer accent bar. -->
+                                                <Border Height="3" CornerRadius="1.5" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,1"
+                                                        Visibility="{x:Bind IndicatorVisibility, Mode=OneWay}" Width="{x:Bind IndicatorWidth, Mode=OneWay}"
+                                                        Background="{x:Bind IndicatorBrush, Mode=OneWay}" IsHitTestVisible="False" />
                                             </Grid>
                                         </Button>
                                     </DataTemplate>
