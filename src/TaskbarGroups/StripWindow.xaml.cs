@@ -82,7 +82,10 @@ public sealed partial class StripWindow : Window
             var windows = WindowSwitcher.Snapshot();
             var foreground = WindowChrome.GetForeground();
             foreach (var tile in tiles)
-                tile.State = tile.Identity.StateIn(windows, foreground);
+            {
+                var s = tile.Identity.StateIn(windows, foreground);
+                tile.State = s;
+            }
         }
         catch (Exception ex)
         {
