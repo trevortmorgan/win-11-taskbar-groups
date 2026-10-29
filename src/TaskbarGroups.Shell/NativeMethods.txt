@@ -11,6 +11,8 @@ UIA_CONTROLTYPE_ID
 
 // Finding the taskbar and its monitor
 FindWindow
+FindWindowEx
+IsWindow
 GetWindowRect
 MonitorFromWindow
 GetMonitorInfo
