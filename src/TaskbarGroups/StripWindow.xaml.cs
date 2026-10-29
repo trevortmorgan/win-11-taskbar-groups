@@ -1,7 +1,9 @@
+using System.Numerics;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using TaskbarGroups.Config;
+using TaskbarGroups.Layout;
 using TaskbarGroups.Shell;
 using Windows.Foundation;
 
@@ -12,6 +14,9 @@ public sealed partial class StripWindow : Window
 {
     /// <summary>App icon size, the same as Windows' own taskbar icons.</summary>
     private const double IconDips = 24;
+
+    /// <summary>The list that opens from the "Groups" button. Created the first time it's needed.</summary>
+    private GroupsFlyout? _flyout;
 
     public StripWindow()
     {
@@ -49,7 +54,10 @@ public sealed partial class StripWindow : Window
                 .Select(a => new AppTile(a, icons.GetValueOrDefault(a.ResolvePath()) is { } icon ? IconLoader.ToBitmap(icon) : null, sizeDips))
                 .ToList()))
             .ToList();
+        _flyout?.SetGroups(GroupViews);
     }
+
+    private IReadOnlyList<GroupView> GroupViews => Pills.ItemsSource as IReadOnlyList<GroupView> ?? [];
 
     /// <summary>Wide pills, or the single "Groups" button.</summary>
     public bool IsCollapsed
@@ -62,6 +70,8 @@ public sealed partial class StripWindow : Window
             GroupsButton.IsHitTestVisible = value;
             Pills.Opacity = value ? 0 : 1;
             Pills.IsHitTestVisible = !value;
+            if (!value)
+                CloseFlyout();
         }
     }
 
@@ -80,6 +90,41 @@ public sealed partial class StripWindow : Window
         if (sender is FrameworkElement { Tag: AppTile tile })
             AppLauncher.Launch(tile.Shortcut);
     }
+
+    /// <summary>The "Groups" button opens (or closes) the list of every group above it.</summary>
+    private void OnGroupsClick(object sender, RoutedEventArgs e)
+    {
+        if (_flyout is { IsOpen: true })
+        {
+            _flyout.Dismiss();
+            return;
+        }
+
+        // Pressing this button while the flyout is open takes the focus away from it, which closes it as the mouse
+        // goes down, just before this click arrives. The click was meant to close it, so don't open it again.
+        if (_flyout is not null && Environment.TickCount64 - _flyout.ClosedAt < 500)
+            return;
+
+        if (_flyout is null)
+        {
+            _flyout = new GroupsFlyout();
+            _flyout.SetGroups(GroupViews);
+            _flyout.Dismissed += (_, _) => Chevron.Rotation = 0;
+        }
+
+        // Centre it over the button, in screen pixels.
+        var scale = Root.XamlRoot.RasterizationScale;
+        var offset = GroupsButton.TransformToVisual(Root).TransformPoint(new Point(0, 0));
+        var left = AppWindow.Position.X + (int)Math.Round(offset.X * scale);
+        var anchor = IntRect.FromSize(left, AppWindow.Position.Y, (int)Math.Round(GroupsButton.ActualWidth * scale), AppWindow.Size.Height);
+
+        Chevron.CenterPoint = new Vector3((float)Chevron.ActualWidth / 2, (float)Chevron.ActualHeight / 2, 0);
+        Chevron.Rotation = 180;
+        _flyout.Open(anchor, scale);
+    }
+
+    /// <summary>Closes the flyout, e.g. because the strip is being hidden or there's room for the pills again.</summary>
+    public void CloseFlyout() => _flyout?.Dismiss();
 
     private void OnExitClick(object sender, RoutedEventArgs e) => Application.Current.Exit();
 }

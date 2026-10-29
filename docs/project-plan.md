@@ -186,3 +186,14 @@ The follow-ups found here are now issues: multi-monitor (#10), fullscreen detect
 - **Launching:** `Process.Start` with `UseShellExecute = true` is the same path as the Run box, so every kind of `path` above works. Launched apps come to the front, even though the strip itself never takes focus (`WS_EX_NOACTIVATE`).
 - **Config:** `groups.json` is created from the sample on first run and reloaded about 400 ms after any save (`FileSystemWatcher`). Invalid JSON is logged and ignored.
 - **Testing:** clicks were tested by invoking the buttons through UI Automation, which fires the same `Click` handler. Checks that need a real mouse are in #18.
+
+## 9b. Groups flyout notes (#4)
+
+- **Its own window.** The strip is `WS_EX_NOACTIVATE`, so a XAML popup inside it would never get the keyboard. `GroupsFlyout` is a separate frameless, topmost window that *can* take focus (`WindowChrome.MakePopup`), drawn over a transparent backdrop with a rounded `SystemBackdropElement` (Desktop Acrylic) panel.
+- **Getting the focus.** Clicking the strip gives our process the right to call `SetForegroundWindow`, so the flyout comes up focused, with the first app focused. This also worked when the button was pressed through UI Automation.
+- **Closing.** Losing activation closes it (clicking elsewhere, including the taskbar). Esc and Alt+F4 close it and hand the focus back to the window that had it; otherwise Windows gives it to the strip. Launching an app closes it after the launch, so the app can still come to the front.
+- **Gotchas found:**
+  - Pressing the Groups button while the flyout is open takes the focus from it as the mouse goes down, which closes it, and then the click opened it again. The click handler now ignores a click within 500 ms of the flyout closing.
+  - The `ScrollViewer` uses the arrow keys to scroll, and focus only moved once the focused app had scrolled out of sight. The flyout handles the arrows itself in `PreviewKeyDown` with `FocusManager.TryMoveFocus`. Up/Down use `NavigationDirectionDistance`, so they don't skip groups whose row is shorter.
+  - The scroll position survived between openings, leaving the focused first app out of sight, so it's reset on open.
+- **Testing:** opening and closing, Esc, arrows, Enter-to-launch and scrolling (30 groups) were checked with UI Automation plus synthesized keys and mouse clicks, in both the Debug build and the trimmed Release publish.

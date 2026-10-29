@@ -135,6 +135,7 @@ internal sealed class TaskbarHost : IDisposable
         _lastHideReason = reason;
         if (_placedAt is null)
             return;
+        _window.CloseFlyout();
         _window.AppWindow.Hide();
         _placedAt = null;
     }

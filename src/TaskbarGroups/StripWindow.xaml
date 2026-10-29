@@ -71,13 +71,25 @@
         </ItemsControl>
 
         <!-- Narrow layout: everything collapses into one button (see design/small-screen.png). -->
-        <Border x:Name="GroupsButton" Height="42" Padding="12,0" CornerRadius="10" HorizontalAlignment="Left" VerticalAlignment="Center"
-                Background="#991F2937" BorderBrush="#806B7280" BorderThickness="1" Opacity="0" IsHitTestVisible="False">
+        <Button x:Name="GroupsButton" Height="42" Padding="12,0" CornerRadius="10" HorizontalAlignment="Left" VerticalAlignment="Center"
+                Background="#991F2937" BorderBrush="#806B7280" BorderThickness="1" Opacity="0" IsHitTestVisible="False"
+                Click="OnGroupsClick" AutomationProperties.Name="Groups">
+            <Button.Resources>
+                <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#CC374151" />
+                <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#B31F2937" />
+                <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="#806B7280" />
+                <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#806B7280" />
+            </Button.Resources>
             <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                 <FontIcon Glyph="&#xE81E;" FontSize="14" Foreground="#60A5FA" />
                 <TextBlock Text="Groups" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
-                <FontIcon Glyph="&#xE70E;" FontSize="10" />
+                <!-- Points down while the flyout is open. -->
+                <FontIcon x:Name="Chevron" Glyph="&#xE70E;" FontSize="10">
+                    <FontIcon.RotationTransition>
+                        <ScalarTransition Duration="0:0:0.2" />
+                    </FontIcon.RotationTransition>
+                </FontIcon>
             </StackPanel>
-        </Border>
+        </Button>
     </Grid>
 </Window>
