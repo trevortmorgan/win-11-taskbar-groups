@@ -45,7 +45,7 @@ public partial class App : Application
         try
         {
             var config = _store!.LoadOrCreate();
-            await _strip!.SetGroupsAsync(config.Groups);
+            await _strip!.SetGroupsAsync(config.Groups, Path.GetDirectoryName(_store.Path)!);
             Log.Info($"Loaded {config.Groups.Count} groups from {_store.Path}");
         }
         catch (Exception ex)

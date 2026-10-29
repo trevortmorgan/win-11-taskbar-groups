@@ -58,5 +58,38 @@ public sealed class ConfigStoreTests
         Assert.AreEqual("Media", loaded.Groups[0].Name);
         Assert.AreEqual("#22C55E", loaded.Groups[0].Color);
         Assert.AreEqual(config.Groups[0].Apps[0], loaded.Groups[0].Apps[0]);
+        Assert.IsNull(loaded.Groups[0].Icon);
+    }
+
+    [TestMethod]
+    public void SaveThenLoad_RoundTripsIcon_AndLeavesItOutWhenUnset()
+    {
+        var path = Path.Combine(_dir, "groups.json");
+        var store = new ConfigStore(path);
+        var config = new GroupsConfig(
+        [
+            new Group("Work", "#3B82F6", [new AppShortcut("Notepad", "notepad.exe")], Icon: "briefcase"),
+            new Group("Misc", "#22C55E", [new AppShortcut("Calc", "calc.exe")]),
+        ]);
+
+        store.Save(config);
+        var json = File.ReadAllText(path);
+        var loaded = store.Load();
+
+        Assert.AreEqual("briefcase", loaded.Groups[0].Icon);
+        Assert.IsNull(loaded.Groups[1].Icon);
+        Assert.AreEqual(1, json.Split("\"icon\"").Length - 1, json);
+        Assert.IsLessThan(json.IndexOf("\"apps\""), json.IndexOf("\"icon\""), "icon should be written before apps");
+    }
+
+    [TestMethod]
+    public void Load_ReadsIconFromHandWrittenJson()
+    {
+        var path = Path.Combine(_dir, "groups.json");
+        File.WriteAllText(path, """
+            { "groups": [ { "name": "Games", "color": "#A855F7", "icon": "games", "apps": [] } ] }
+            """);
+
+        Assert.AreEqual("games", new ConfigStore(path).Load().Groups[0].Icon);
     }
 }

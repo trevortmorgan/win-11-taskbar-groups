@@ -8,4 +8,9 @@
     <IsTrimmable>true</IsTrimmable>
   </PropertyGroup>
 
+  <!-- Group icons: a curated subset of Microsoft's Fluent UI System Icons (MIT, see Icons/Fluent/LICENSE). -->
+  <ItemGroup>
+    <EmbeddedResource Include="Icons\Fluent\*.svg" LogicalName="Fluent/%(Filename)%(Extension)" />
+  </ItemGroup>
+
 </Project>

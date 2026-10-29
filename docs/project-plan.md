@@ -144,6 +144,7 @@ Each feature is built on its own branch and merged through a PR that references 
 | 2026-10-28 | MIT licence. Repo made **public**, so the "Protect main" ruleset (PRs required) is enforced on the free plan. Commits use the GitHub noreply address. |
 | 2026-10-29 | Overlay window (approach A) chosen; parenting into the taskbar (B) not pursued (§9). |
 | 2026-10-29 | Remaining work moved from this document to **GitHub Issues and milestones**. Each feature gets its own branch. |
+| 2026-10-29 | **Group icons** (#8): a curated subset of Microsoft's Fluent UI System Icons (MIT) is bundled as SVG. A group can also point at the user's own `.svg` file, e.g. one from any set on icones.js.org; it isn't redistributed, so only Fluent's licence ships. Drawn with `SvgImageSource` at exact screen pixels, using the Fluent variant (16/20/24 px) drawn for that size. |
 
 ## 8. Milestone 0 notes
 

@@ -16,6 +16,7 @@ Until the settings screen exists (milestone 4), you edit the groups file by hand
     {
       "name": "Work",
       "color": "#3B82F6",
+      "icon": "briefcase",
       "apps": [
         { "name": "File Explorer", "path": "shell:AppsFolder\\Microsoft.Windows.Explorer" },
         { "name": "Reports", "path": "D:\\Reports" },
@@ -27,6 +28,10 @@ Until the settings screen exists (milestone 4), you edit the groups file by hand
 ```
 
 - **`color`** is `#RRGGBB`.
+- **`icon`** is optional. It's drawn in the group's colour; without one, the group gets a coloured dot. It can be:
+  - **a built-in icon name.** These come from Microsoft's [Fluent UI System Icons](https://github.com/microsoft/fluentui-system-icons): airplane, animal-cat, apps, beaker, book, briefcase, bug, building, calculator, calendar, camera, cart, chat, cloud, code, color, data-bar-vertical, database, design-ideas, desktop, document, drink-coffee, flash, folder, food, games, gift, globe, hat-graduation, headphones, heart, home, image, key, laptop, leaf-one, library, lightbulb, lock-closed, mail, mic, money, movies-and-tv, music-note-2, news, notebook, paint-brush, pen, people, person, phone, puzzle-piece, rocket, server, settings, shield, sparkle, sport, star, target, toolbox, trophy, video, wallet, window-console, wrench. You can preview them in the *Fluent UI System Icons* collection on [Icônes](https://icones.js.org/collection/fluent).
+  - **your own `.svg` file**, e.g. `"icon": "icons\\rocket.svg"`. A relative path is relative to the folder `groups.json` is in. Any icon on [Icônes](https://icones.js.org/) works: open it, download the SVG and save it there. Single-colour icons take the group's colour; multi-colour ones keep theirs. Check the licence of the set you pick if you share your icons with others.
+  - If the name or file isn't found, the group shows the dot and the reason goes in the log.
 - **`path`** is anything you could type into the Run box (Win+R): an `.exe`, a `.lnk` shortcut, a folder, a URL, or a Store app as `shell:AppsFolder\<AppID>`. Environment variables like `%LOCALAPPDATA%` work.
 - **Finding App IDs:** in PowerShell, run `Get-StartApps` to list the App ID of every app in the Start menu, including Store apps.
 - **`arguments`** is optional.
@@ -72,4 +77,4 @@ User config lives at `%APPDATA%\TaskbarGroups\groups.json`. Until that file exis
 
 ## Licence
 
-[MIT](LICENSE)
+[MIT](LICENSE). The bundled Fluent icons are © Microsoft, also MIT: see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
