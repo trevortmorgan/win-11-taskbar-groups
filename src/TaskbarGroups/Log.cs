@@ -9,11 +9,13 @@ internal static class Log
     private static readonly string FilePath =
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TaskbarGroups", "taskbargroups.log");
 
+    public static string Directory => Path.GetDirectoryName(FilePath)!;
+
     private static readonly Lock Gate = new();
 
     public static void Start()
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
+        System.IO.Directory.CreateDirectory(Directory);
         File.WriteAllText(FilePath, "");
         Info($"Started {Environment.ProcessPath} (pid {Environment.ProcessId})");
     }

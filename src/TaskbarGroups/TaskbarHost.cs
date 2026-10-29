@@ -20,6 +20,7 @@ internal sealed class TaskbarHost : IDisposable
     private IntRect? _placedAt;
     private bool _updating;
     private string? _lastHideReason;
+    private bool _userHidden;
 
     public TaskbarHost(StripWindow window)
     {
@@ -33,6 +34,19 @@ internal sealed class TaskbarHost : IDisposable
         _timer.Tick += (_, _) => _ = UpdateAsync();
         _timer.Start();
         _ = UpdateAsync();
+    }
+
+    /// <summary>True while the user has hidden the strip from the tray menu. Not remembered between launches.</summary>
+    public bool UserHidden
+    {
+        get => _userHidden;
+        set
+        {
+            if (_userHidden == value)
+                return;
+            _userHidden = value;
+            _ = UpdateAsync();
+        }
     }
 
     private void OnForegroundChanged(nint hwnd)
@@ -70,6 +84,7 @@ internal sealed class TaskbarHost : IDisposable
     {
         var hideReason = taskbar switch
         {
+            _ when _userHidden => "hidden from the tray menu",
             null => "no taskbar",
             { IsOnScreen: false } => "taskbar auto-hidden",
             { IsHorizontal: false } => "taskbar not horizontal",
